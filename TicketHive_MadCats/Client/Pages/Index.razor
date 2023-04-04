@@ -13,8 +13,7 @@
 <img src="/images/logos/yellow.png" alt="TicketHiveLogo" width="250" height="250">
 <p>Get started by logging in or registering:</p>
 <div>
-    <a @onclick="gotoLogin" class="btn-login">Login</a>
-    <a href="NavigationPaths.Register" class="btn-register">Register</a>
+    <h2>Click on the login or register button on top of the navigation bar!</h2>
 </div>
 
 <style>
@@ -33,10 +32,3 @@
             background-color: #305076;
         }
 </style>
-
-@code{
-    public void gotoLogin()
-    {
-        navMan.NavigateTo("/Areas/Identity/Pages/Account/Login");
-    }
-}
