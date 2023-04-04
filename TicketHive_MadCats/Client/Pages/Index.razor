@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inherits LayoutComponentBase
+@inject NavigationManager navMan
 
 <h1 style="color: #305076;">Welcome to Ticket Hive!</h1>
 <p>Here's some information about our app:
@@ -12,7 +13,7 @@
 <img src="/images/logos/yellow.png" alt="TicketHiveLogo" width="250" height="250">
 <p>Get started by logging in or registering:</p>
 <div>
-    <a href="NavigationPaths.Login" class="btn-login">Login</a>
+    <a @onclick="gotoLogin" class="btn-login">Login</a>
     <a href="NavigationPaths.Register" class="btn-register">Register</a>
 </div>
 
@@ -32,3 +33,10 @@
             background-color: #305076;
         }
 </style>
+
+@code{
+    public void gotoLogin()
+    {
+        navMan.NavigateTo("/Areas/Identity/Pages/Account/Login");
+    }
+}
