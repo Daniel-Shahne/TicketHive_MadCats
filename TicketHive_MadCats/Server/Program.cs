@@ -103,7 +103,7 @@ using(var serviceProvider = builder.Services.BuildServiceProvider())
     }
 
     // Ifall en vanlig user användare inte finns, skapa den
-    if (signInManager.UserManager.FindByNameAsync("admin").GetAwaiter().GetResult() == null)
+    if (signInManager.UserManager.FindByNameAsync("user").GetAwaiter().GetResult() == null)
     {
         var userUser = new ApplicationUser()
         {
