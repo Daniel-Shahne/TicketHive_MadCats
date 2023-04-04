@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketHive_MadCats.Server", "TicketHive_MadCats\Server\TicketHive_MadCats.Server.csproj", "{17EC8A3C-029F-475F-8229-1C33CE071841}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketHive_MadCats.Server", "TicketHive_MadCats\Server\TicketHive_MadCats.Server.csproj", "{17EC8A3C-029F-475F-8229-1C33CE071841}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketHive_MadCats.Client", "TicketHive_MadCats\Client\TicketHive_MadCats.Client.csproj", "{99F3F037-D789-4418-ADDD-C3079513D367}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketHive_MadCats.Client", "TicketHive_MadCats\Client\TicketHive_MadCats.Client.csproj", "{99F3F037-D789-4418-ADDD-C3079513D367}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketHive_MadCats.Shared", "TicketHive_MadCats\Shared\TicketHive_MadCats.Shared.csproj", "{60795F5C-E6A1-426F-8084-040E83A1BCE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketHive_MadCats.Shared", "TicketHive_MadCats\Shared\TicketHive_MadCats.Shared.csproj", "{60795F5C-E6A1-426F-8084-040E83A1BCE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
