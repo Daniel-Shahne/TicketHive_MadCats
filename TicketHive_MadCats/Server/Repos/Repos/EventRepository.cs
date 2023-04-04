@@ -57,23 +57,23 @@ namespace TicketHive_MadCats.Server.Repos.Repos
             return false;
         }
 
-        public Task<List<EventModel>> GetAllEvents()
+        public async Task<List<EventModel>> GetAllEvents()
         {
             //Inkluderar tickets
-            return _context.Events.Include(e => e.Tickets).ToListAsync();
+            return await _context.Events.Include(e => e.Tickets).ToListAsync();
             //annars
             //return _context.Events.ToListAsync();
         }
 
-        public Task<EventModel?> GetOneEventById(int id)
+        public async Task<EventModel?> GetOneEventById(int id)
         {
-            return _context.Events.FirstOrDefaultAsync(e => e.Id == id);
+            return await _context.Events.FirstOrDefaultAsync(e => e.Id == id);
         }
 
         //inkluderar tickets
-        public Task<EventModel?> GetOneEventByIdWithTickets(int id)
+        public async Task<EventModel?> GetOneEventByIdWithTickets(int id)
         {
-            return _context.Events.Include(e => e.Tickets).FirstOrDefaultAsync(e => e.Id == id);
+            return await _context.Events.Include(e => e.Tickets).FirstOrDefaultAsync(e => e.Id == id);
         }
     }
 }
