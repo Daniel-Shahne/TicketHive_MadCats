@@ -20,17 +20,17 @@ namespace TicketHive_MadCats.Server.Repos.Repos
             throw new NotImplementedException();
         }
 
-        public async Task<List<TicketModel>> CreateTickets(int eventId, int quantity)
-        {
-            var tickets = Enumerable.Range(0, quantity)
-                .Select(i => new TicketModel { EventModelId = eventId })
-                .ToList();
+        //public async Task<List<TicketModel>> CreateTickets(int eventId, int quantity)
+        //{
+        //    var tickets = Enumerable.Range(0, quantity)
+        //        .Select(i => new TicketModel { EventModelId = eventId })
+        //        .ToList();
 
-            _context.Tickets.AddRange(tickets);
-            await _context.SaveChangesAsync();
+        //    _context.Tickets.AddRange(tickets);
+        //    await _context.SaveChangesAsync();
 
-            return tickets;
-        }
+        //    return tickets;
+        //}
         
         //v1
         public async Task<bool> DeleteTicket(int id)

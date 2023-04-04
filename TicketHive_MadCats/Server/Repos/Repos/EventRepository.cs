@@ -21,26 +21,15 @@ public class EventRepository : IEventRepo
 
     public async Task<EventModel?> CreateEvent(EventModel model)
     {
-        var newEvent = new EventModel
-        {
-            Name = model.Name,
-            EventType = model.EventType,
-            MaxTickets = model.MaxTickets,
-            TicketPrice = model.TicketPrice,
-            Location = model.Location,
-            Date = model.Date,
-            ImageSrcs = model.ImageSrcs
-        };
-
-        _context.Events.Add(newEvent);
+        _context.Events.Add(model);
         await _context.SaveChangesAsync();
 
         // Create tickets for the new event
-        var tickets = await _ticketRepository.CreateTickets(newEvent.Id, newEvent.MaxTickets);
+        var tickets = await _ticketRepository.CreateTickets(model.Id, model.MaxTickets);
 
-        newEvent.Tickets = tickets;
+        model.Tickets = tickets;
 
-        return newEvent;
+        return model;
     }
 
     /// <summary>
