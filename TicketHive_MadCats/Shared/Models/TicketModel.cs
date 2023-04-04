@@ -18,7 +18,7 @@ namespace TicketHive_MadCats.Shared.Models
         public int UserId { get; set; }
 
         // Navigation property and its id
-        public int EventId { get; set; }
-        public EventModel Event { get; set; } = null!;
+        public int EventModelId { get; set; }
+        public EventModel EventModel { get; set; } = null!;
     }
 }

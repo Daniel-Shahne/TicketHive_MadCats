@@ -32,6 +32,6 @@ namespace TicketHive_MadCats.Shared.Models
         public int MaxTickets { get; set; }
 
         // Navigation properties
-        public List<TicketModel> Tickets { get; set; } = new();
+        public List<TicketModel> Tickets { get; set; }
     }
 }
