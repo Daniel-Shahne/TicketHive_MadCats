@@ -15,9 +15,12 @@ namespace TicketHive_MadCats.Server.Repos.Repos
             _context = context;
         }
 
-        public Task<TicketModel?> CreateTicket(TicketModel ticketModel)
+        public async Task<TicketModel?> CreateTicket(TicketModel ticketModel)
         {
-            throw new NotImplementedException();
+            _context.Tickets.Add(ticketModel);
+            await _context.SaveChangesAsync();
+
+            return ticketModel;
         }
 
         //public async Task<List<TicketModel>> CreateTickets(int eventId, int quantity)

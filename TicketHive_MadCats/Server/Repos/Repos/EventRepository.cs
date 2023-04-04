@@ -24,11 +24,6 @@ public class EventRepository : IEventRepo
         _context.Events.Add(model);
         await _context.SaveChangesAsync();
 
-        // Create tickets for the new event
-        var tickets = await _ticketRepository.CreateTickets(model.Id, model.MaxTickets);
-
-        model.Tickets = tickets;
-
         return model;
     }
 
