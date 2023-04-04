@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using TicketHive_MadCats.Shared;
+using TicketHive_MadCats.Shared.Models;
 
 namespace TicketHive_MadCats.Server.Controllers
 {
@@ -32,5 +34,12 @@ namespace TicketHive_MadCats.Server.Controllers
             })
             .ToArray();
         }
+
+        //[HttpGet]
+        //[Authorize(Roles = "Admin")]
+        //public void Delete(int id)
+        //{
+        //    // DeleteTicket(int id)
+        //}
     }
 }
