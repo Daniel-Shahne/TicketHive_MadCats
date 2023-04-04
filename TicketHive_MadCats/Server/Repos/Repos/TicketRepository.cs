@@ -49,26 +49,26 @@ namespace TicketHive_MadCats.Server.Repos.Repos
         }
 
         //v2, så denna tar först in evented som ticket tillhör. Sedan hittar den ticket.id som vi valt och deletar den.
-        public async Task<bool> DeleteTicket(int eventId, int ticketId)
-        {
-            var eventToUpdate = await _context.Events.Include(e => e.Tickets).FirstOrDefaultAsync(e => e.Id == eventId);
+        //public async Task<bool> DeleteTicket(int eventId, int ticketId)
+        //{
+        //    var eventToUpdate = await _context.Events.Include(e => e.Tickets).FirstOrDefaultAsync(e => e.Id == eventId);
 
-            if (eventToUpdate != null)
-            {
-                var ticketToDelete = eventToUpdate.Tickets.FirstOrDefault(t => t.Id == ticketId);
+        //    if (eventToUpdate != null)
+        //    {
+        //        var ticketToDelete = eventToUpdate.Tickets.FirstOrDefault(t => t.Id == ticketId);
 
-                if (ticketToDelete != null)
-                {
-                    eventToUpdate.Tickets.Remove(ticketToDelete);
+        //        if (ticketToDelete != null)
+        //        {
+        //            eventToUpdate.Tickets.Remove(ticketToDelete);
 
-                    await _context.SaveChangesAsync();
+        //            await _context.SaveChangesAsync();
 
-                    return true;
-                }
-            }
+        //            return true;
+        //        }
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
 
 

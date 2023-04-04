@@ -12,7 +12,6 @@ namespace TicketHive_MadCats.Server.Repos.Repos;
 public class EventRepository : IEventRepo
 {
     public readonly EventTicketDbContext _context;
-    public readonly TicketRepository _ticketRepository;
 
     public EventRepository(EventTicketDbContext context)
     {
@@ -43,26 +42,22 @@ public class EventRepository : IEventRepo
             _context.SaveChanges();
             return true;
         }
-
         return false;
     }
 
     public async Task<List<EventModel>> GetAllEvents()
     {
-        //Inkluderar tickets
         return await _context.Events.Include(e => e.Tickets).ToListAsync();
-        //annars
-        //return _context.Events.ToListAsync();
     }
 
     public async Task<EventModel?> GetOneEventById(int id)
     {
-        return await _context.Events.FirstOrDefaultAsync(e => e.Id == id);
+        return await _context.Events.Include(e => e.Tickets).FirstOrDefaultAsync(e => e.Id == id);
     }
 
     //inkluderar tickets
-    public async Task<EventModel?> GetOneEventByIdWithTickets(int id)
-    {
-        return await _context.Events.Include(e => e.Tickets).FirstOrDefaultAsync(e => e.Id == id);
-    }
+    //public async Task<EventModel?> GetOneEventByIdWithTickets(int id)
+    //{
+    //    return await _context.Events.Include(e => e.Tickets).FirstOrDefaultAsync(e => e.Id == id);
+    //}
 }
