@@ -27,7 +27,6 @@ builder.Services.AddIdentityServer()
         options.ApiResources.Single().UserClaims.Add("role");
     });
 
-
 // Adds out own EventTicket database context to DIC
 var connectionString2 = builder.Configuration.GetConnectionString("EventTicketDatabaseString");
 builder.Services.AddDbContext<EventTicketDbContext>(options =>
