@@ -11,7 +11,7 @@ namespace TicketHive_MadCats.Server.Data
             
         }
 
-        public EventTicketDbContext(DbContextOptions optionsBuilder) : base(optionsBuilder)
+        public EventTicketDbContext(DbContextOptions<EventTicketDbContext> optionsBuilder) : base(optionsBuilder)
         {
             
         }

@@ -5,11 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using TicketHive_MadCats.Server.Data;
 using TicketHive_MadCats.Server.Models;
+using TicketHive_MadCats.Server.Repos.RepoInterfaces;
+using TicketHive_MadCats.Server.Repos.Repos;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("UsersDatabaseString") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -24,6 +26,18 @@ builder.Services.AddIdentityServer()
         options.IdentityResources["openid"].UserClaims.Add("role");
         options.ApiResources.Single().UserClaims.Add("role");
     });
+
+// Adds out own EventTicket database context to DIC
+var connectionString2 = builder.Configuration.GetConnectionString("EventTicketDatabaseString");
+builder.Services.AddDbContext<EventTicketDbContext>(options =>
+{
+    options.UseSqlServer(connectionString2);
+});
+
+// Adds the repos for our EventTicket database to DIC
+builder.Services.AddScoped<ITicketRepo, TicketRepository>();
+builder.Services.AddScoped<IEventRepo, EventRepository>();
+
 
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
