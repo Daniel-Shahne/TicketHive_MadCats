@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using System.Text.Json
+@using Newtonsoft.Json;
 @using TicketHive_MadCats.Shared.Models;
 @inherits LayoutComponentBase
 @inject NavigationManager navMan
@@ -19,7 +20,8 @@
     <h2>Click on the login or register button on top of the navigation bar!</h2>
 </div>
 
-<button @onclick="testDeser">Testa deser</button>
+<button @onclick="testDeser">Testa deserialisera</button>
+<button @onclick="testAdminEndpoint">Testa admin endpoint (LOGGA IN FÖRST)</button>
 
 <style>
     .btn-login, .btn-register {
@@ -41,8 +43,46 @@
 @code{
     public async Task testDeser()
     {
+        // Det går INTE att använda HttpClient som finns i DI-Container
+        // då det leder till något skumt authentication error, men går bra
+        // med en helt ny client? Får fråga albin
+
+        // Deserialisation måste ske med newtonsofts JsonConvert då modellerna har tekniskt
+        // sett andra namn än vad json svarar med, då .NETs inbyggda serialiserare i API't
+        // skapar variabler med liten bokstav i början (därav JsonProperty dekoratorer för
+        // varje modell)
+
+        // Detta funkar inte då det använder DIC client och får error redan vid response
         //var response = await client.GetAsync("/api/Events/2");
         //var json = await response.Content.ReadAsStringAsync();
         //EventModel? model = System.Text.Json.JsonSerializer.Deserialize<EventModel>(json);
+
+        HttpClient newClient = new();
+
+        // Detta funkar inte då det använder .NET's deserialiserare
+        //var response2 = await newClient.GetAsync("https://localhost:7157/api/Events/1");
+        //var json2 = await response2.Content.ReadAsStringAsync();
+        //EventModel? model = JsonSerializer.Deserialize<EventModel>(json2);
+
+        // Metod som funkar och ger ett korrekt eventmodel
+        var json3 = await newClient.GetStringAsync("https://localhost:7157/api/Events/1");
+        EventModel? model = JsonConvert.DeserializeObject<EventModel>(json3);
+    }
+
+    public async Task testAdminEndpoint()
+    {
+        // Testar ta bort en eventmodel som inte finns vilket bör returnera false
+        // ifall inloggad som admin.
+
+        // Ger 401 unauthorized oavsett om inloggad som admin eller inte
+        //HttpClient newClient = new();
+        //var response = await newClient.DeleteAsync("https://localhost:7157/api/Events/5");
+        //var code = response.StatusCode;
+        //var body = await response.Content.ReadAsStringAsync();
+
+        // Ger 403 forbidden error WTF
+        var response2 = await client.DeleteAsync("https://localhost:7157/api/Events/5");
+        var code2 = response2.StatusCode;
+        var body2 = await response2.Content.ReadAsStringAsync();
     }
 }
