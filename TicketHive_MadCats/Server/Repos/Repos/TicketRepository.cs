@@ -23,11 +23,6 @@ namespace TicketHive_MadCats.Server.Repos.Repos
             return ticketModel;
         }
 
-        public Task<List<TicketModel>> GetAllTickets()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<TicketModel>> GetAllTicketsByUserId(int userId)
         {
             return await _context.Tickets.Where(t => t.UserId == userId)
