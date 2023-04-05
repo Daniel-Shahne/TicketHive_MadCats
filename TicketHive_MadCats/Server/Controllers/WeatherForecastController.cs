@@ -6,7 +6,6 @@ using TicketHive_MadCats.Shared.Models;
 
 namespace TicketHive_MadCats.Server.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase

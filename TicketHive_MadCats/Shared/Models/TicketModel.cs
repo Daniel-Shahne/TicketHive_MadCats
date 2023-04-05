@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace TicketHive_MadCats.Shared.Models
@@ -19,6 +20,7 @@ namespace TicketHive_MadCats.Shared.Models
 
         // Navigation property and its id
         public int EventModelId { get; set; }
+        [JsonIgnore]
         public EventModel EventModel { get; set; } = null!;
     }
 }

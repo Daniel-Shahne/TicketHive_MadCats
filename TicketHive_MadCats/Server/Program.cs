@@ -42,6 +42,16 @@ builder.Services.AddScoped<IEventRepo, EventRepository>();
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAll", builder =>
+//    {
+//        builder.AllowAnyOrigin()
+//               .AllowAnyMethod()
+//               .AllowAnyHeader();
+//    });
+//});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 

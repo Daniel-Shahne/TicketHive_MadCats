@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using TicketHive_MadCats.Server.Repos.RepoInterfaces;
 using TicketHive_MadCats.Server.Repos.Repos;
@@ -10,6 +11,7 @@ namespace TicketHive_MadCats.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // [EnableCors("AllowAll")]
     public class EventsController : ControllerBase
     {
         private readonly IEventRepo eventRepo;

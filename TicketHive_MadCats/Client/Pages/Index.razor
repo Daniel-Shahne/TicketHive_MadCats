@@ -1,7 +1,10 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Text.Json
+@using TicketHive_MadCats.Shared.Models;
 @inherits LayoutComponentBase
 @inject NavigationManager navMan
+@inject HttpClient client
 
 <h1 style="color: #305076;">Welcome to Ticket Hive!</h1>
 <p>Here's some information about our app:
@@ -15,6 +18,8 @@
 <div>
     <h2>Click on the login or register button on top of the navigation bar!</h2>
 </div>
+
+<button @onclick="testDeser">Testa deser</button>
 
 <style>
     .btn-login, .btn-register {
@@ -32,3 +37,12 @@
             background-color: #305076;
         }
 </style>
+
+@code{
+    public async Task testDeser()
+    {
+        //var response = await client.GetAsync("/api/Events/2");
+        //var json = await response.Content.ReadAsStringAsync();
+        //EventModel? model = System.Text.Json.JsonSerializer.Deserialize<EventModel>(json);
+    }
+}
