@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TicketHive_MadCats.Server.Repos.RepoInterfaces;
 using TicketHive_MadCats.Server.Repos.Repos;
 using TicketHive_MadCats.Shared.Models;
 
@@ -11,14 +12,14 @@ namespace TicketHive_MadCats.Server.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
-        private readonly EventRepository eventRepo;
+        private readonly IEventRepo eventRepo;
 
-        public EventsController(EventRepository eventRepo)
+        public EventsController(IEventRepo eventRepo)
         {
             this.eventRepo = eventRepo;
         }
 
-        
+        // base/api/Events
         [HttpGet]
         public async Task<List<EventModel>> GetAll()
         {
