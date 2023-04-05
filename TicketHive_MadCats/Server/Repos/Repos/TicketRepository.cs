@@ -23,18 +23,18 @@ namespace TicketHive_MadCats.Server.Repos.Repos
             return ticketModel;
         }
 
-        //public async Task<List<TicketModel>> CreateTickets(int eventId, int quantity)
-        //{
-        //    var tickets = Enumerable.Range(0, quantity)
-        //        .Select(i => new TicketModel { EventModelId = eventId })
-        //        .ToList();
+        public Task<List<TicketModel>> GetAllTickets()
+        {
+            throw new NotImplementedException();
+        }
 
-        //    _context.Tickets.AddRange(tickets);
-        //    await _context.SaveChangesAsync();
+        public async Task<List<TicketModel>> GetAllTicketsByUserId(int userId)
+        {
+            return await _context.Tickets.Where(t => t.UserId == userId)
+                                         .Include(t => t.EventModel)
+                                         .ToListAsync();
+        }
 
-        //    return tickets;
-        //}
-        
         //v1
         public async Task<bool> DeleteTicket(int id)
         {
@@ -46,6 +46,11 @@ namespace TicketHive_MadCats.Server.Repos.Repos
                 return true;
             }
             return false;
+        }
+
+        public Task<TicketModel?> GetOneTicketById(int id)
+        {
+            throw new NotImplementedException();
         }
 
         //v2, så denna tar först in evented som ticket tillhör. Sedan hittar den ticket.id som vi valt och deletar den.
@@ -71,15 +76,18 @@ namespace TicketHive_MadCats.Server.Repos.Repos
         //}
 
 
+        //public async Task<List<TicketModel>> CreateTickets(int eventId, int quantity)
+        //{
+        //    var tickets = Enumerable.Range(0, quantity)
+        //        .Select(i => new TicketModel { EventModelId = eventId })
+        //        .ToList();
 
-        public Task<List<TicketModel>> GetAllTickets()
-        {
-            throw new NotImplementedException();
-        }
+        //    _context.Tickets.AddRange(tickets);
+        //    await _context.SaveChangesAsync();
 
-        public Task<TicketModel?> GetOneTicketById(int id)
-        {
-            throw new NotImplementedException();
-        }
+        //    return tickets;
+        //}
+
+
     }
 }
