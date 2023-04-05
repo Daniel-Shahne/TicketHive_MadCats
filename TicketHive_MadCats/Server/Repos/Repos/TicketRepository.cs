@@ -48,9 +48,9 @@ namespace TicketHive_MadCats.Server.Repos.Repos
             return false;
         }
 
-        public Task<TicketModel?> GetOneTicketById(int id)
+        public async Task<TicketModel?> GetOneTicketById(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Tickets.Include(t => t.EventModel).FirstOrDefaultAsync(t => t.Id == id);
         }
 
         //v2, så denna tar först in evented som ticket tillhör. Sedan hittar den ticket.id som vi valt och deletar den.
