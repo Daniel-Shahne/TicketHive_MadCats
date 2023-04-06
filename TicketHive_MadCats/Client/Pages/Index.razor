@@ -75,6 +75,8 @@
         // ifall inloggad som admin.
 
         // Ger 401 unauthorized oavsett om inloggad som admin eller inte
+        // vilket kanske är logiskt för den nya clienten har inte kontextet av
+        // den nuvarande inloggade personen?
         //HttpClient newClient = new();
         //var response = await newClient.DeleteAsync("https://localhost:7157/api/Events/5");
         //var code = response.StatusCode;

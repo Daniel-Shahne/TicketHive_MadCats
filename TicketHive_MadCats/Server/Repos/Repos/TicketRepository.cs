@@ -15,12 +15,19 @@ namespace TicketHive_MadCats.Server.Repos.Repos
             _context = context;
         }
 
+        // TODO: Check which error occurs if primary key conflicts
         public async Task<TicketModel?> CreateTicket(TicketModel ticketModel)
         {
-            _context.Tickets.Add(ticketModel);
-            await _context.SaveChangesAsync();
-
-            return ticketModel;
+            try
+            {
+                _context.Tickets.Add(ticketModel);
+                await _context.SaveChangesAsync();
+                return ticketModel;
+            }
+            catch(DbUpdateException ex)
+            {
+                return null;
+            }
         }
 
         public async Task<List<TicketModel>> GetAllTicketsByUserId(int userId)
