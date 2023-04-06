@@ -55,7 +55,9 @@ public class EventRepository : IEventRepo
 
     public async Task<List<EventModel>> GetAllEvents()
     {
-        return await _context.Events.Include(e => e.Tickets).ToListAsync();
+
+        var allEvents = await _context.Events.Include(e => e.Tickets).ToListAsync();
+        return allEvents;
     }
 
     public async Task<EventModel?> GetOneEventById(int id)

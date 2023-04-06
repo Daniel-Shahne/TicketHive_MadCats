@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using TicketHive_MadCats.Server.Repos.RepoInterfaces;
 using TicketHive_MadCats.Server.Repos.Repos;
 using TicketHive_MadCats.Shared.Models;
+using TicketHive_MadCats.Shared.ViewModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,6 +13,7 @@ namespace TicketHive_MadCats.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     // [EnableCors("AllowAll")]
     public class EventsController : ControllerBase
     {
@@ -23,16 +26,30 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // base/api/Events
         [HttpGet]
-        public async Task<List<EventModel>> GetAll()
+        public async Task<ActionResult<List<EventViewModel>>> GetAll()
         {
-            return await eventRepo.GetAllEvents();
+            List<EventModel> listOfModels = await eventRepo.GetAllEvents();
+            List<EventViewModel> listOfViewModels = listOfModels.Select(model => new EventViewModel(model)).ToList();
+
+            if(!listOfViewModels.Any())
+            {
+                return BadRequest();
+            }
+
+            return Ok(listOfViewModels);
         }
 
         // GET api/<EventsController>/5
         [HttpGet("{id}")]
-        public async Task<EventModel?> Get(int id)
+        public async Task<EventViewModel?> Get(int id)
         {
-            return await eventRepo.GetOneEventById(id);
+            EventModel? model = await eventRepo.GetOneEventById(id);
+            if(model != null)
+            {
+                EventViewModel viewModel = new(model);
+                return viewModel;
+            }
+            else return null;
         }
 
         // POST api/<EventsController>
@@ -52,7 +69,7 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // DELETE api/<EventsController>/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<bool> Delete(int id)
         {
             return await eventRepo.DeleteEventById(id);

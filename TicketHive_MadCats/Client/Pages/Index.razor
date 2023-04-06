@@ -3,9 +3,11 @@
 @using System.Text.Json
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Shared.Models;
+@using TicketHive_MadCats.Shared.ViewModels;
 @inherits LayoutComponentBase
 @inject NavigationManager navMan
 @inject HttpClient client
+@inject AuthenticationStateProvider authStateProvider
 
 <h1 style="color: #305076;">Welcome to Ticket Hive!</h1>
 <p>Here's some information about our app:
@@ -43,48 +45,32 @@
 @code{
     public async Task testDeser()
     {
-        // Det går INTE att använda HttpClient som finns i DI-Container
-        // då det leder till något skumt authentication error, men går bra
-        // med en helt ny client? Får fråga albin
+        // Ger 500 error???
+        var response1 = await client.GetAsync("/api/Events");
+        var body1 = await response1.Content.ReadAsStringAsync();
+        
+        // Göra calls t.ex. om vi endast är inloggade
+        //var authState = await authStateProvider.GetAuthenticationStateAsync();
+        //var user = authState.User;
 
-        // Deserialisation måste ske med newtonsofts JsonConvert då modellerna har tekniskt
-        // sett andra namn än vad json svarar med, då .NETs inbyggda serialiserare i API't
-        // skapar variabler med liten bokstav i början (därav JsonProperty dekoratorer för
-        // varje modell)
-
-        // Detta funkar inte då det använder DIC client och får error redan vid response
-        //var response = await client.GetAsync("/api/Events/2");
-        //var json = await response.Content.ReadAsStringAsync();
-        //EventModel? model = System.Text.Json.JsonSerializer.Deserialize<EventModel>(json);
-
-        HttpClient newClient = new();
-
-        // Detta funkar inte då det använder .NET's deserialiserare
-        //var response2 = await newClient.GetAsync("https://localhost:7157/api/Events/1");
-        //var json2 = await response2.Content.ReadAsStringAsync();
-        //EventModel? model = JsonSerializer.Deserialize<EventModel>(json2);
-
-        // Metod som funkar och ger ett korrekt eventmodel
-        var json3 = await newClient.GetStringAsync("https://localhost:7157/api/Events/1");
-        EventModel? model = JsonConvert.DeserializeObject<EventModel>(json3);
+        //if (user.Identity.IsAuthenticated)
+        //{
+        //    var response = await client.GetAsync("https://localhost:7157/api/Events");
+        //    var body = await response.Content.ReadAsStringAsync();
+        //    List<EventViewModel> listOfModels = JsonConvert.DeserializeObject<List<EventViewModel>>(body);
+        //}
     }
 
     public async Task testAdminEndpoint()
     {
-        // Testar ta bort en eventmodel som inte finns vilket bör returnera false
-        // ifall inloggad som admin.
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-        // Ger 401 unauthorized oavsett om inloggad som admin eller inte
-        // vilket kanske är logiskt för den nya clienten har inte kontextet av
-        // den nuvarande inloggade personen?
-        //HttpClient newClient = new();
-        //var response = await newClient.DeleteAsync("https://localhost:7157/api/Events/5");
-        //var code = response.StatusCode;
-        //var body = await response.Content.ReadAsStringAsync();
-
-        // Ger 403 forbidden error WTF
-        var response2 = await client.DeleteAsync("https://localhost:7157/api/Events/5");
-        var code2 = response2.StatusCode;
-        var body2 = await response2.Content.ReadAsStringAsync();
+        if (user.Claims.Where(c => c.ToString().Contains("Admin")).Any())
+        {
+            var response2 = await client.DeleteAsync("https://localhost:7157/api/Events/5");
+            var code2 = response2.StatusCode;
+            var body2 = await response2.Content.ReadAsStringAsync();
+        }
     }
 }
