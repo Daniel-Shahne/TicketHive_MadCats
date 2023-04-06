@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.Diagnostics.Eventing.Reader;
 using System.Text;
 using TicketHive_MadCats.Shared.Models;
+using TicketHive_MadCats.Shared.ViewModels;
 
 namespace TicketHive_MadCats.Server.Testers
 {
@@ -26,6 +27,8 @@ namespace TicketHive_MadCats.Server.Testers
 
             // If noone is logged in, so no authentication, fail immediately
             if (!user.Identity.IsAuthenticated) return false;
+
+
 
             // ---------------- EVENTS API TESTING ---------------------
 
@@ -86,16 +89,48 @@ namespace TicketHive_MadCats.Server.Testers
             // Tests deleting a nonexistent event, if user is admin
             // and if we dont have 9999 events for some ungodly reason
             // I.e this one should only fail the test if the deletion
-            // operation is successfull
+            // operation is successfull even though it SHOULD not happen
             if (user.IsInRole("Admin"))
             {
                 var deleteResponse = await client.DeleteAsync("/api/Events/9999");
                 if (deleteResponse.IsSuccessStatusCode) return false;
             }
 
-            // Gets one event if user is logged in
+            // Gets one event (id 1) if anyone is logged in
+            // Fails if no eventviewmodel could be retrieved 
+            if (user.Identity.IsAuthenticated)
+            {
+                // Checks if response is ok
+                var getOneResponse = await client.GetAsync("api/Events/1");
+                if (!getOneResponse.IsSuccessStatusCode) { return false; }
+                
+                // Checks if deserialisation was ok
+                var getOneJson = await getOneResponse.Content.ReadAsStringAsync();
+                EventViewModel? model = JsonConvert.DeserializeObject<EventViewModel>(getOneJson);
+                if (model == null) { return false; }
+            }
 
+            // Tries to get an event that does not exist (id 9999)
+            // which should not result in an ok status
+            if (user.Identity.IsAuthenticated)
+            {
+                // Fails if status code IS ok, as that shouldnt be possible
+                var getOneResponse = await client.GetAsync("api/Events/9999");
+                if (getOneResponse.IsSuccessStatusCode) { return false; }
+            }
 
+            // Gets all events if anyone is logged in
+            if (user.Identity.IsAuthenticated)
+            {
+                // Checks if response status is ok
+                var getAllResponse = await client.GetAsync("api/Events");
+                if (!getAllResponse.IsSuccessStatusCode) { return false; }
+                
+                // Tries deserialising the body
+                var getAllJson = await getAllResponse.Content.ReadAsStringAsync();
+                List<EventViewModel>? listOfViewModels = JsonConvert.DeserializeObject<List<EventViewModel>>(getAllJson);
+                if (listOfViewModels == null) { return false; }
+            }
 
             // If all ran tests succeeded, return true
             return true;

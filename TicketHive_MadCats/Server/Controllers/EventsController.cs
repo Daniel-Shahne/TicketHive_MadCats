@@ -40,15 +40,15 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // GET api/<EventsController>/5
         [HttpGet("{id}")]
-        public async Task<EventViewModel?> Get(int id)
+        public async Task<ActionResult<EventViewModel?>> Get(int id)
         {
             EventModel? model = await eventRepo.GetOneEventById(id);
             if(model != null)
             {
                 EventViewModel viewModel = new(model);
-                return viewModel;
+                return Ok(viewModel);
             }
-            else return null;
+            else return BadRequest();
         }
 
         // POST api/<EventsController>
@@ -62,7 +62,7 @@ namespace TicketHive_MadCats.Server.Controllers
             }
             else
             {
-                return BadRequest(null);
+                return BadRequest();
             }
         }
 
