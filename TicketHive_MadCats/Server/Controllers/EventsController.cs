@@ -35,7 +35,6 @@ namespace TicketHive_MadCats.Server.Controllers
             {
                 return BadRequest();
             }
-
             return Ok(listOfViewModels);
         }
 
@@ -54,11 +53,17 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // POST api/<EventsController>
         [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<EventModel?> Post(EventModel model)
+        public async Task<ActionResult<EventModel?>> Post(EventModel model)
         {
             EventModel? newModel = await eventRepo.CreateEvent(model);
-            return newModel;
+            if(newModel != null)
+            {
+                return Ok(newModel);
+            }
+            else
+            {
+                return BadRequest(null);
+            }
         }
 
         // PUT api/<EventsController>/5
@@ -69,10 +74,17 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // DELETE api/<EventsController>/5
         [HttpDelete("{id}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<bool> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return await eventRepo.DeleteEventById(id);
+            bool success = await eventRepo.DeleteEventById(id);
+            if(success)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }

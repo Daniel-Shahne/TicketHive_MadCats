@@ -11,13 +11,28 @@ namespace TicketHive_MadCats.Shared.ViewModels
 {
     public class EventViewModel
     {
+        [JsonProperty("id")]
         public int Id { get; set; }
+
+        [JsonProperty("name")]
         public string Name { get; set; } = null!;
+
+        [JsonProperty("eventType")]
         public string EventType { get; set; } = null!;
+
+        [JsonProperty("ticketPrice")]
         public int TicketPrice { get; set; }
+
+        [JsonProperty("location")]
         public string Location { get; set; } = null!;
+
+        [JsonProperty("date")]
         public DateTime Date { get; set; }
+
+        [JsonProperty("imageSrcs")]
         public string ImageSrcs { get; set; } = null!;
+
+        [JsonProperty("maxTickets")]
         public int MaxTickets { get; set; }
 
         /// <summary>
@@ -40,6 +55,12 @@ namespace TicketHive_MadCats.Shared.ViewModels
             ImageSrcs = model.ImageSrcs;
             MaxTickets = model.MaxTickets;
             BookedTickets = model.Tickets.Count;
+        }
+
+        [JsonConstructor]
+        public EventViewModel()
+        {
+            
         }
     }
 }
