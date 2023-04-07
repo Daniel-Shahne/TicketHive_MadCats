@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using TicketHive_MadCats.Server.Repos.RepoInterfaces;
 using TicketHive_MadCats.Server.Repos.Repos;
 using TicketHive_MadCats.Shared.Models;
+using TicketHive_MadCats.Shared.ViewModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,6 +14,7 @@ namespace TicketHive_MadCats.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     // [EnableCors("AllowAll")]
     public class EventsController : ControllerBase
     {
@@ -23,25 +27,46 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // base/api/Events
         [HttpGet]
-        public async Task<List<EventModel>> GetAll()
+        public async Task<ActionResult<List<EventViewModel>>> GetAll()
         {
-            return await eventRepo.GetAllEvents();
+            List<EventModel> listOfModels = await eventRepo.GetAllEvents();
+            List<EventViewModel> listOfViewModels = listOfModels.Select(model => new EventViewModel(model)).ToList();
+
+            if(!listOfViewModels.Any())
+            {
+                return NotFound();
+            }
+            return Ok(listOfViewModels);
         }
 
         // GET api/<EventsController>/5
         [HttpGet("{id}")]
-        public async Task<EventModel?> Get(int id)
+        public async Task<ActionResult<EventViewModel?>> Get(int id)
         {
-            return await eventRepo.GetOneEventById(id);
+            EventModel? model = await eventRepo.GetOneEventById(id);
+            if(model != null)
+            {
+                EventViewModel viewModel = new(model);
+                return Ok(viewModel);
+            }
+            else return NotFound();
         }
 
         // POST api/<EventsController>
         [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<EventModel?> Post(EventModel model)
+        public async Task<ActionResult> Post([FromBody]string newtonsoftModel)
         {
+            EventModel? model = JsonConvert.DeserializeObject<EventModel>(newtonsoftModel);
+            if(model is null) return NotFound("Could not instantiate an EventModel");
             EventModel? newModel = await eventRepo.CreateEvent(model);
-            return newModel;
+            if(newModel != null)
+            {
+                return Ok(newModel.Id);
+            }
+            else
+            {
+                return NotFound("Could not create a database entry for the event");
+            }
         }
 
         // PUT api/<EventsController>/5
@@ -52,10 +77,17 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // DELETE api/<EventsController>/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<bool> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return await eventRepo.DeleteEventById(id);
+            bool success = await eventRepo.DeleteEventById(id);
+            if(success)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }

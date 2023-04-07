@@ -52,7 +52,8 @@ builder.Services.AddAuthentication()
 //    });
 //});
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddNewtonsoftJson(); // TODO Hope this wont break shit. Added due to POST controller method issues
 builder.Services.AddRazorPages();
 
 var app = builder.Build();

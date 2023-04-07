@@ -1,10 +1,14 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using System.Text.Json
+@using Newtonsoft.Json;
+@using TicketHive_MadCats.Server.Testers;
 @using TicketHive_MadCats.Shared.Models;
+@using TicketHive_MadCats.Shared.ViewModels;
 @inherits LayoutComponentBase
 @inject NavigationManager navMan
 @inject HttpClient client
+@inject AuthenticationStateProvider authStateProvider
 
 <h1 style="color: #305076;">Welcome to Ticket Hive!</h1>
 <p>Here's some information about our app:
@@ -19,7 +23,9 @@
     <h2>Click on the login or register button on top of the navigation bar!</h2>
 </div>
 
-<button @onclick="testDeser">Testa deser</button>
+<button @onclick="testEventEndpoints">Test all endpoints</button>
+
+<div>Event API test result: @eventApiTestStatus</div>
 
 <style>
     .btn-login, .btn-register {
@@ -39,10 +45,19 @@
 </style>
 
 @code{
-    public async Task testDeser()
+    // Injicerar både dessa för användning i ApiTesters
+    [Inject]
+    public HttpClient clientInCode { get; set; }
+    [Inject]
+    public AuthenticationStateProvider authInCode { get; set; }
+
+    // Används för att visa testernas status på UI't som en bool
+    public bool? eventApiTestStatus = null;
+
+    // Testar alla endpoints med testers instanser
+    public async Task testEventEndpoints()
     {
-        //var response = await client.GetAsync("/api/Events/2");
-        //var json = await response.Content.ReadAsStringAsync();
-        //EventModel? model = System.Text.Json.JsonSerializer.Deserialize<EventModel>(json);
+        EventApiTester tester = new(authInCode, clientInCode);
+        eventApiTestStatus = await tester.testEndpoints();
     }
 }

@@ -18,12 +18,20 @@ public class EventRepository : IEventRepo
         _context = context;
     }
 
+    // TODO: Check which error occurs if trying to add an already
+    // existing event or if primary key conflicts
     public async Task<EventModel?> CreateEvent(EventModel model)
     {
-        _context.Events.Add(model);
-        await _context.SaveChangesAsync();
-
-        return model;
+        try
+        {
+            _context.Events.Add(model);
+            await _context.SaveChangesAsync();
+            return model;
+        }
+        catch(DbUpdateException ex)
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -47,7 +55,9 @@ public class EventRepository : IEventRepo
 
     public async Task<List<EventModel>> GetAllEvents()
     {
-        return await _context.Events.Include(e => e.Tickets).ToListAsync();
+
+        var allEvents = await _context.Events.Include(e => e.Tickets).ToListAsync();
+        return allEvents;
     }
 
     public async Task<EventModel?> GetOneEventById(int id)
