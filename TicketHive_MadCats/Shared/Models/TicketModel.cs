@@ -26,6 +26,7 @@ namespace TicketHive_MadCats.Shared.Models
         public int EventModelId { get; set; }
 
         [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public EventModel EventModel { get; set; } = null!;
     }
 }

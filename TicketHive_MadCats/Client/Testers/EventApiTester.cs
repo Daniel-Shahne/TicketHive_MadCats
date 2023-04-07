@@ -45,7 +45,7 @@ namespace TicketHive_MadCats.Server.Testers
             // Tests posting a valid new event
             if (user.IsInRole("Admin"))
             {
-                // New event to post. Has no tickets though for simplicity.
+                // New event to post
                 EventModel newModel = new()
                 {
                     Name = "TestValidEvent",
@@ -54,6 +54,20 @@ namespace TicketHive_MadCats.Server.Testers
                     Location = "location test",
                     Date = DateTime.Now,
                     ImageSrcs = "NOT VALID",
+                    MaxTickets = 10,
+                    Tickets = new()
+                    {
+                        new TicketModel
+                        {
+                            UserId = 1,
+                            EventModelId = 1
+                        },
+                        new TicketModel
+                        {
+                            UserId = 1,
+                            EventModelId = 1
+                        }
+                    }
                 };
 
                 // Serializes and sends the event
@@ -116,12 +130,26 @@ namespace TicketHive_MadCats.Server.Testers
                 EventModel newModel = new()
                 {
                     Id = 1,
-                    Name = "TestEventFromIndexPage",
+                    Name = "TestINVALIDEvent",
                     EventType = "event type test",
                     TicketPrice = 10,
                     Location = "location test",
                     Date = DateTime.Now,
                     ImageSrcs = "NOT VALID",
+                    MaxTickets = 10,
+                    Tickets = new()
+                    {
+                        new TicketModel
+                        {
+                            UserId = 1,
+                            EventModelId = 1
+                        },
+                        new TicketModel
+                        {
+                            UserId = 1,
+                            EventModelId = 1
+                        }
+                    }
                 };
 
                 string serializedModel = JsonConvert.SerializeObject(newModel);
