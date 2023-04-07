@@ -62,7 +62,7 @@ namespace TicketHive_MadCats.Server.Testers
                 //var postResponse = await client.PostAsync("/api/Events/", content);
 
                 // Another approach. Mutually exclusive with above.
-                var postResponse = await client.PostAsJsonAsync<EventModel>("/api/Events", newModel);
+                var postResponse = await client.PostAsJsonAsync<EventModel>("/api/Events/Post", newModel);
 
                 // If the post request failed then fail the test here
                 if (!postResponse.IsSuccessStatusCode) 
