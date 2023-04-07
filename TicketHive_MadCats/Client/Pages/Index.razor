@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using System.Text.Json
 @using Newtonsoft.Json;
+@using TicketHive_MadCats.Client.Testers;
+@*Apparently it thinks EventApiTester is still in server project?*@
 @using TicketHive_MadCats.Server.Testers;
 @using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.ViewModels;
@@ -26,6 +28,7 @@
 <button @onclick="testEventEndpoints">Test all endpoints</button>
 
 <div>Event API test result: @eventApiTestStatus</div>
+<div>Event API test result: @ticketApiTestStatus</div>
 
 <style>
     .btn-login, .btn-register {
@@ -53,11 +56,15 @@
 
     // Används för att visa testernas status på UI't som en bool
     public bool? eventApiTestStatus = null;
+    public bool? ticketApiTestStatus = null;
 
     // Testar alla endpoints med testers instanser
     public async Task testEventEndpoints()
     {
-        EventApiTester tester = new(authInCode, clientInCode);
-        eventApiTestStatus = await tester.testEndpoints();
+        EventApiTester eventTester = new(authInCode, clientInCode);
+        eventApiTestStatus = await eventTester.testEndpoints();
+
+        TicketsApiTester ticketTester = new(authInCode, clientInCode);
+        ticketApiTestStatus = await ticketTester.testEndpoints();
     }
 }

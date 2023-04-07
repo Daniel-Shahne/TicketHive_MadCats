@@ -65,7 +65,7 @@ namespace TicketHive_MadCats.Server.Controllers
             }
             else
             {
-                return NotFound("Could not create a database entry for the event");
+                return Conflict("Could not create a database entry for the event");
             }
         }
 
