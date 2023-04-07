@@ -42,10 +42,10 @@ namespace TicketHive_MadCats.Server.Testers
 
             // Is used to save the id of the POSTED event to then delete it
             int createdEventId = 0;
-            // Tests posting a valid new event (TODO: CANT REACH ENDPOINT)
+            // Tests posting a valid new event
             if (user.IsInRole("Admin"))
             {
-                // New event to post
+                // New event to post and serialization
                 EventModel newModel = new()
                 {
                     Name = "TestValidEvent",
@@ -69,15 +69,15 @@ namespace TicketHive_MadCats.Server.Testers
                         }
                     }
                 };
-
-                // Serializes and sends the event
                 string serializedModel = JsonConvert.SerializeObject(newModel);
 
-                // Fungerande lösning, fattar inte varför inget annat sätt funkar
+                // Working way to send a post request. Everything else seems to not work
                 var postResponse = await client.PostAsJsonAsync("api/Events", serializedModel);
 
                 // If post request succeded, continue and save its id for deletion
-                // in next test. Fail test otherwise
+                // in next test, as an integer corresponding to the events id in
+                // the database is returned in the Ok status message body.
+                // Fails test if request is unsuccessfull.
                 if (postResponse.IsSuccessStatusCode)
                 {
                     var body = await postResponse.Content.ReadAsStringAsync();
@@ -89,7 +89,6 @@ namespace TicketHive_MadCats.Server.Testers
                     return false;
                 }
             }
-
             // Deletes the newly created event
             if (user.IsInRole("Admin"))
             {
