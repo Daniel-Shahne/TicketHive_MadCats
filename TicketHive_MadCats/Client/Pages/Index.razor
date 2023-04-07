@@ -45,14 +45,16 @@
 </style>
 
 @code{
+    // Injicerar både dessa för användning i ApiTesters
     [Inject]
     public HttpClient clientInCode { get; set; }
-
     [Inject]
     public AuthenticationStateProvider authInCode { get; set; }
 
+    // Används för att visa testernas status på UI't som en bool
     public bool? eventApiTestStatus = null;
 
+    // Testar alla endpoints med testers instanser
     public async Task testEventEndpoints()
     {
         EventApiTester tester = new(authInCode, clientInCode);
