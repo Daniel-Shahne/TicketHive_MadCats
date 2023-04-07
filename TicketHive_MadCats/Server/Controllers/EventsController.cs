@@ -53,7 +53,7 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // POST api/<EventsController>
         [HttpPost]
-        public async Task<ActionResult<EventModel?>> Post(EventModel model)
+        public async Task<ActionResult<EventModel?>> Post([FromBody]EventModel model)
         {
             EventModel? newModel = await eventRepo.CreateEvent(model);
             if(newModel != null)
@@ -62,7 +62,7 @@ namespace TicketHive_MadCats.Server.Controllers
             }
             else
             {
-                return BadRequest();
+                return NotFound();
             }
         }
 

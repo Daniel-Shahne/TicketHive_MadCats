@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
 using System.Diagnostics.Eventing.Reader;
+using System.Net.Http.Json;
 using System.Text;
 using TicketHive_MadCats.Shared.Models;
 using TicketHive_MadCats.Shared.ViewModels;
@@ -56,9 +57,12 @@ namespace TicketHive_MadCats.Server.Testers
                 };
 
                 // Serializes and sends the event
-                string serializedModel = JsonConvert.SerializeObject(newModel);
-                var content = new StringContent(serializedModel, Encoding.UTF8, "application/json");
-                var postResponse = await client.PostAsync("/api/Events", content);
+                //string serializedModel = JsonConvert.SerializeObject(newModel);
+                //var content = new StringContent(serializedModel, Encoding.UTF8, "application/json");
+                //var postResponse = await client.PostAsync("/api/Events/", content);
+
+                // Another approach. Mutually exclusive with above.
+                var postResponse = await client.PostAsJsonAsync<EventModel>("/api/Events", newModel);
 
                 // If the post request failed then fail the test here
                 if (!postResponse.IsSuccessStatusCode) 

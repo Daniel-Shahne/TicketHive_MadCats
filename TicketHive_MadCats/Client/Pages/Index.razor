@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using System.Text.Json
 @using Newtonsoft.Json;
+@using TicketHive_MadCats.Server.Testers;
 @using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inherits LayoutComponentBase
@@ -22,7 +23,9 @@
     <h2>Click on the login or register button on top of the navigation bar!</h2>
 </div>
 
-<button>Test all endpoints (not implemented)</button>
+<button @onclick="testEventEndpoints">Test all endpoints</button>
+
+<div>Event API test result: @eventApiTestStatus</div>
 
 <style>
     .btn-login, .btn-register {
@@ -42,5 +45,17 @@
 </style>
 
 @code{
+    [Inject]
+    public HttpClient clientInCode { get; set; }
 
+    [Inject]
+    public AuthenticationStateProvider authInCode { get; set; }
+
+    public bool? eventApiTestStatus = null;
+
+    public async Task testEventEndpoints()
+    {
+        EventApiTester tester = new(authInCode, clientInCode);
+        eventApiTestStatus = await tester.testEndpoints();
+    }
 }
