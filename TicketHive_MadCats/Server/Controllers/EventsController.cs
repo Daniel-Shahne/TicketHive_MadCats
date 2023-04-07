@@ -53,13 +53,12 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // POST api/<EventsController>
         [HttpPost]
-        [Route("Post")]
-        public async Task<ActionResult<EventModel?>> Post([FromBody]EventModel model)
+        public async Task<ActionResult> Post([FromBody]EventModel model)
         {
             EventModel? newModel = await eventRepo.CreateEvent(model);
             if(newModel != null)
             {
-                return Ok(newModel);
+                return Ok();
             }
             else
             {
