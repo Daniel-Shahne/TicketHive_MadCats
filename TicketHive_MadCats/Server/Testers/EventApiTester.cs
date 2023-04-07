@@ -21,16 +21,23 @@ namespace TicketHive_MadCats.Server.Testers
 
         public async Task<bool> testEndpoints()
         {
+            // ---------------- PREPARING FOR TESTS ------------------------
+            
             // Gets the user
             var state = await authStateProvider.GetAuthenticationStateAsync();
             var user = state.User;
 
-            // If noone is logged in, so no authentication, fail immediately
+            // Apparently user can be null so need to fail if thats the case too
+            // even though i tested with albin and somewhat sure user is allways
+            // an object, even if its an empty one
+            if (user is null) return false;
+            
+            // If user is not authenticated: fail immediately
             if (!user.Identity.IsAuthenticated) return false;
 
 
 
-            // ---------------- EVENTS API TESTING ---------------------
+            // ---------------- POSTING AND DELETING ---------------------
 
             // Is used to save the id of the created event to then delete it
             int createdEventId = 0;
@@ -40,7 +47,7 @@ namespace TicketHive_MadCats.Server.Testers
                 // New event to post. Has no tickets though for simplicity.
                 EventModel newModel = new()
                 {
-                    Name = "TestEventFromIndexPage",
+                    Name = "TestValidEvent",
                     EventType = "event type test",
                     TicketPrice = 10,
                     Location = "location test",
@@ -96,6 +103,36 @@ namespace TicketHive_MadCats.Server.Testers
                 if (deleteResponse.IsSuccessStatusCode) return false;
             }
 
+            // Tries posting an invalid event, which is one with a conflicting
+            // (already existing) primary key. Should result in bad request, fail
+            // otherwise
+            if (user.IsInRole("Admin"))
+            {
+                // New INVALID event to post. Has no tickets though for simplicity.
+                EventModel newModel = new()
+                {
+                    Id = 1,
+                    Name = "TestEventFromIndexPage",
+                    EventType = "event type test",
+                    TicketPrice = 10,
+                    Location = "location test",
+                    Date = DateTime.Now,
+                    ImageSrcs = "NOT VALID",
+                };
+
+                string serializedModel = JsonConvert.SerializeObject(newModel);
+                var content = new StringContent(serializedModel, Encoding.UTF8, "application/json");
+                var postResponse = await client.PostAsync("/api/Events", content);
+
+                // If the post request is anything other than bad request, fail here
+                if (postResponse.StatusCode != System.Net.HttpStatusCode.BadRequest)
+                {
+                    return false;
+                }
+            }
+
+            // --------------------- GETTING -------------------------
+
             // Gets one event (id 1) if anyone is logged in
             // Fails if no eventviewmodel could be retrieved 
             if (user.Identity.IsAuthenticated)
@@ -111,12 +148,12 @@ namespace TicketHive_MadCats.Server.Testers
             }
 
             // Tries to get an event that does not exist (id 9999)
-            // which should not result in an ok status
+            // which should not result in anything other than bad request status
             if (user.Identity.IsAuthenticated)
             {
-                // Fails if status code IS ok, as that shouldnt be possible
+                // Fails if status code is anything other than bad request
                 var getOneResponse = await client.GetAsync("api/Events/9999");
-                if (getOneResponse.IsSuccessStatusCode) { return false; }
+                if (getOneResponse.StatusCode != System.Net.HttpStatusCode.BadRequest) { return false; }
             }
 
             // Gets all events if anyone is logged in
