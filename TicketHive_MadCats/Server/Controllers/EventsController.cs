@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using TicketHive_MadCats.Server.Repos.RepoInterfaces;
 using TicketHive_MadCats.Server.Repos.Repos;
 using TicketHive_MadCats.Shared.Models;
@@ -53,16 +54,18 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // POST api/<EventsController>
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody]EventModel model)
+        public async Task<ActionResult> Post([FromBody]string newtonsoftModel)
         {
+            EventModel? model = JsonConvert.DeserializeObject<EventModel>(newtonsoftModel);
+            if(model is null) return NotFound("Could not instantiate an EventModel");
             EventModel? newModel = await eventRepo.CreateEvent(model);
             if(newModel != null)
             {
-                return Ok();
+                return Ok(newModel.Id);
             }
             else
             {
-                return NotFound();
+                return NotFound("Could not create a database entry for the event");
             }
         }
 

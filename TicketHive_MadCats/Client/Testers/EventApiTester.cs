@@ -40,9 +40,9 @@ namespace TicketHive_MadCats.Server.Testers
 
             // ---------------- POSTING AND DELETING ---------------------
 
-            // Is used to save the id of the created event to then delete it
+            // Is used to save the id of the POSTED event to then delete it
             int createdEventId = 0;
-            // Tests posting a valid new event
+            // Tests posting a valid new event (TODO: CANT REACH ENDPOINT)
             if (user.IsInRole("Admin"))
             {
                 // New event to post
@@ -71,28 +71,25 @@ namespace TicketHive_MadCats.Server.Testers
                 };
 
                 // Serializes and sends the event
-                //string serializedModel = JsonConvert.SerializeObject(newModel);
-                //var content = new StringContent(serializedModel, Encoding.UTF8, "application/json");
-                //var postResponse = await client.PostAsync("/api/Events/", content);
+                string serializedModel = JsonConvert.SerializeObject(newModel);
 
-                // Another approach. Mutually exclusive with above.
-                var postResponse = await client.PostAsJsonAsync<EventModel>("api/Events", newModel);
+                // Fungerande lösning, fattar inte varför inget annat sätt funkar
+                var postResponse = await client.PostAsJsonAsync("api/Events", serializedModel);
 
-                // If the post request failed then fail the test here
-                if (!postResponse.IsSuccessStatusCode) 
-                { 
-                    return false; 
-                }
-
-                // Gets the response body and deserializes it to get the new id (or fails test)
-                var responseBody = await postResponse.Content.ReadAsStringAsync();
-                EventModel? responseModel = JsonConvert.DeserializeObject<EventModel>(responseBody);
-                if (responseModel != null)
+                // If post request succeded, continue and save its id for deletion
+                // in next test. Fail test otherwise
+                if (postResponse.IsSuccessStatusCode)
                 {
-                    createdEventId = responseModel.Id;
+                    var body = await postResponse.Content.ReadAsStringAsync();
+                    int newId = JsonConvert.DeserializeObject<int>(body);
+                    createdEventId = newId;
                 }
-                else return false;
+                else
+                {
+                    return false;
+                }
             }
+
             // Deletes the newly created event
             if (user.IsInRole("Admin"))
             {
@@ -138,26 +135,13 @@ namespace TicketHive_MadCats.Server.Testers
                     ImageSrcs = "NOT VALID",
                     MaxTickets = 10,
                     Tickets = new()
-                    {
-                        new TicketModel
-                        {
-                            UserId = 1,
-                            EventModelId = 1
-                        },
-                        new TicketModel
-                        {
-                            UserId = 1,
-                            EventModelId = 1
-                        }
-                    }
                 };
 
-                string serializedModel = JsonConvert.SerializeObject(newModel);
-                var content = new StringContent(serializedModel, Encoding.UTF8, "application/json");
-                var postResponse = await client.PostAsync("/api/Events", content);
+                var serializedModel = JsonConvert.SerializeObject(newModel);
+                var postResponse = await client.PostAsJsonAsync("api/Events", serializedModel);
 
-                // If the post request is anything other than bad request, fail here
-                if (postResponse.StatusCode != System.Net.HttpStatusCode.BadRequest)
+                // If the post request is anything other than NOT FOUND, fail here
+                if (postResponse.StatusCode != System.Net.HttpStatusCode.NotFound)
                 {
                     return false;
                 }
