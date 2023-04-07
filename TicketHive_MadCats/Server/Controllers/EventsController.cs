@@ -34,7 +34,7 @@ namespace TicketHive_MadCats.Server.Controllers
 
             if(!listOfViewModels.Any())
             {
-                return BadRequest();
+                return NotFound();
             }
             return Ok(listOfViewModels);
         }
@@ -49,7 +49,7 @@ namespace TicketHive_MadCats.Server.Controllers
                 EventViewModel viewModel = new(model);
                 return Ok(viewModel);
             }
-            else return BadRequest();
+            else return NotFound();
         }
 
         // POST api/<EventsController>

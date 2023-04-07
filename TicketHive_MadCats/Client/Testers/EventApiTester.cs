@@ -168,7 +168,7 @@ namespace TicketHive_MadCats.Server.Testers
             {
                 // Fails if status code is anything other than bad request
                 var getOneResponse = await client.GetAsync("api/Events/9999");
-                if (getOneResponse.StatusCode != System.Net.HttpStatusCode.BadRequest) { return false; }
+                if (getOneResponse.StatusCode != System.Net.HttpStatusCode.NotFound) { return false; }
             }
 
             // Gets all events if anyone is logged in
