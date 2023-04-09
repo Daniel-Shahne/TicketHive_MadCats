@@ -70,29 +70,12 @@ namespace TicketHive_MadCats.Server.Controllers
 
 
         // POST api/<TicketsController>
-        [HttpPost("{eventId}times{quantity}")]
+        [HttpPost("{userName}books{eventId}times{quantity}")]
         [Authorize]
-        public async Task<ActionResult> Post(int eventId, int quantity)
+        public async Task<ActionResult> Post(string userName, int eventId, int quantity)
         {
-            // TODO: THIS DOESNT WORK BECAUSE INJECTING AUTHENTICATION STATE PROVIDER FUCKS UP ENDPOINTS
-            // Check if an user is logged in, and returns error codes if
-            // something went wrong with logging in.
-            //var state = await authStateProvider.GetAuthenticationStateAsync();
-            //if (state is null) return Unauthorized("Couldnt get an authentication state");
-            //var claimsPrincipal = state.User;
-            //if (claimsPrincipal is null) return Unauthorized("Couldnt get the claims principal");
-            //ApplicationUser? loggedInUser = await userManager.GetUserAsync(claimsPrincipal);
-            //if (loggedInUser is null) return Unauthorized("Couldnt get application user object");
-            //// Gets the logged in users name
-            //string username = loggedInUser.UserName;
-
-            // Solution 2
-            var test2id = userManager.GetUserId(User);
-            var aplUser2 = await userManager.FindByIdAsync(test2id);
-
-            // Solution 1
-            var applicationUser = await userManager.GetUserAsync(User);
-            if (applicationUser is null) { return Unauthorized("Coudl not get application user"); }
+            var user = await userManager.FindByNameAsync(userName);
+            if (user == null) { return Unauthorized($"No user with name {userName} found"); }
 
             // TODO REMOVE THIS, ONLY FOR TESTING GETTING USERID
             int userId = 0;
