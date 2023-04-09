@@ -16,12 +16,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<ApplicationUser>()
+builder.Services.AddDefaultIdentity<CustomUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddIdentityServer()
-    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
+    .AddApiAuthorization<CustomUser, ApplicationDbContext>(options =>
     {
         options.IdentityResources["openid"].UserClaims.Add("role");
         options.ApiResources.Single().UserClaims.Add("role");
@@ -91,7 +91,7 @@ app.MapFallbackToFile("index.html");
 using(var serviceProvider = builder.Services.BuildServiceProvider())
 {
     var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
-    var signInManager = serviceProvider.GetRequiredService<SignInManager<ApplicationUser>>();
+    var signInManager = serviceProvider.GetRequiredService<SignInManager<CustomUser>>();
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
     context.Database.Migrate();
@@ -110,9 +110,10 @@ using(var serviceProvider = builder.Services.BuildServiceProvider())
     // Ifall en användare som HETER admin inte finns, skapas den
     if(signInManager.UserManager.FindByNameAsync("admin").GetAwaiter().GetResult() == null)
     {
-        var adminUser = new ApplicationUser()
+        var adminUser = new CustomUser()
         {
-            UserName = "admin"
+            UserName = "admin",
+            Country = "Sweden"
         };
 
         var createAdminResult = signInManager.UserManager.CreateAsync(adminUser, "Password1234!").GetAwaiter().GetResult();
@@ -130,9 +131,10 @@ using(var serviceProvider = builder.Services.BuildServiceProvider())
     // Ifall en vanlig user användare inte finns, skapa den
     if (signInManager.UserManager.FindByNameAsync("user").GetAwaiter().GetResult() == null)
     {
-        var userUser = new ApplicationUser()
+        var userUser = new CustomUser()
         {
-            UserName = "user"
+            UserName = "user",
+            Country = "Sweden"
         };
 
         var createUserResult = signInManager.UserManager.CreateAsync(userUser, "Password1234!").GetAwaiter().GetResult();

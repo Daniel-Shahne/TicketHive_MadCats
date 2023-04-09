@@ -6,7 +6,7 @@ using TicketHive_MadCats.Server.Models;
 
 namespace TicketHive_MadCats.Server.Data
 {
-    public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
+    public class ApplicationDbContext : ApiAuthorizationDbContext<CustomUser>
     {
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options,

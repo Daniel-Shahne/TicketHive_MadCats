@@ -19,9 +19,9 @@ namespace TicketHive_MadCats.Server.Controllers
     {
         private readonly ITicketRepo ticketRepo;
         private readonly IEventRepo eventRepo;
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly UserManager<CustomUser> userManager;
 
-        public TicketsController(ITicketRepo ticketRepo, IEventRepo eventRepo, UserManager<ApplicationUser> userManager)
+        public TicketsController(ITicketRepo ticketRepo, IEventRepo eventRepo, UserManager<CustomUser> userManager)
         {
             this.ticketRepo = ticketRepo;
             this.eventRepo = eventRepo;

@@ -10,7 +10,7 @@ namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
     [BindProperties]
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly SignInManager<CustomUser> signInManager;
 
         [Required(ErrorMessage = "Username is required")]
         public string? Username { get; set; }
@@ -18,7 +18,7 @@ namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
         [Required(ErrorMessage = "Password is required")]
         public string? Password { get; set; }
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager)
+        public LoginModel(SignInManager<CustomUser> signInManager)
         {
             this.signInManager = signInManager;
         }

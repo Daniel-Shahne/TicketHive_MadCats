@@ -10,7 +10,7 @@ namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
     [BindProperties]
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly SignInManager<CustomUser> signInManager;
 
         [Required(ErrorMessage = "Username is required")]
         [MinLength(5, ErrorMessage = "Username must be at least 5 characters")]
@@ -20,7 +20,7 @@ namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
         [MinLength(5, ErrorMessage = "Password must be at least 5 characters")]
         public string? Password { get; set; }
 
-        public RegisterModel(SignInManager<ApplicationUser> signInManager)
+        public RegisterModel(SignInManager<CustomUser> signInManager)
         {
             this.signInManager = signInManager;
         }
@@ -33,7 +33,7 @@ namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser newUser = new()
+                CustomUser newUser = new()
                 {
                     UserName = Username
                 };
