@@ -18,15 +18,16 @@ namespace TicketHive_MadCats.Server.Repos.RepoInterfaces
         /// 
         /// </summary>
         /// <returns>Returns all ticketes</returns>
-        public Task<List<TicketModel>> GetAllTicketsByUserId(int userId);
+        public Task<List<TicketModel>> GetAllTicketsByUserName(string userName);
 
         /// <summary>
-        /// Creates a new ticket. This is not necessarily an admin
-        /// operation as anyone should be able to book, i.e create a ticket
+        /// Creates new tickets. This is not necessarily an admin
+        /// operation as anyone should be able to book, i.e create a ticket.
+        /// Will try to add all tickets at once. If issues occurs, adds none
         /// </summary>
-        /// <param name="ticketModel">The new ticket to create</param>
-        /// <returns>Returns the created ticket, per convention. Returns null if failed to create the ticket</returns>
-        public Task<TicketModel?> CreateTicket(TicketModel ticketModel);
+        /// <param name="ticketModel">The new tickets to create</param>
+        /// <returns>Bool representing success of adding all entries to database</returns>
+        public Task<bool> CreateTickets(List<TicketModel> ticketModel);
 
         /// <summary>
         /// Deletes a ticket of given Id. This is not necessarily an admin

@@ -59,12 +59,12 @@ namespace TicketHive_MadCats.Server.Testers
                     {
                         new TicketModel
                         {
-                            UserId = 1,
+                            Username = "admin",
                             EventModelId = 1
                         },
                         new TicketModel
                         {
-                            UserId = 1,
+                            Username = "admin",
                             EventModelId = 1
                         }
                     }
@@ -140,7 +140,7 @@ namespace TicketHive_MadCats.Server.Testers
                 var postResponse = await client.PostAsJsonAsync("api/Events", serializedModel);
 
                 // If the post request is anything other than NOT FOUND, fail here
-                if (postResponse.StatusCode != System.Net.HttpStatusCode.NotFound)
+                if (postResponse.StatusCode != System.Net.HttpStatusCode.Conflict)
                 {
                     return false;
                 }

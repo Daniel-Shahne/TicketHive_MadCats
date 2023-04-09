@@ -78,25 +78,25 @@ namespace TicketHive_MadCats.Server.Data
                 new TicketModel()
                 {
                     Id = 1,
-                    UserId = 1,
+                    Username = "admin",
                     EventModelId = 1
                 },
                 new TicketModel()
                 {
                     Id = 2,
-                    UserId = 1,
+                    Username = "admin",
                     EventModelId = 1
                 },
                 new TicketModel()
                 {
                     Id = 3,
-                    UserId = 2,
+                    Username = "admin",
                     EventModelId = 2
                 },
                 new TicketModel()
                 {
                     Id = 4,
-                    UserId = 1,
+                    Username = "user",
                     EventModelId = 2
                 }
                 );

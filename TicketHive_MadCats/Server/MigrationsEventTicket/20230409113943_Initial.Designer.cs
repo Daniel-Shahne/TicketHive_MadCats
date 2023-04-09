@@ -9,10 +9,10 @@ using TicketHive_MadCats.Server.Data;
 
 #nullable disable
 
-namespace TicketHive_MadCats.Server.Data.MigrationsEventTicket
+namespace TicketHive_MadCats.Server.MigrationsEventTicket
 {
     [DbContext(typeof(EventTicketDbContext))]
-    [Migration("20230404075140_Initial")]
+    [Migration("20230409113943_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -66,7 +66,7 @@ namespace TicketHive_MadCats.Server.Data.MigrationsEventTicket
                         new
                         {
                             Id = 1,
-                            Date = new DateTime(2023, 4, 4, 9, 51, 40, 496, DateTimeKind.Local).AddTicks(141),
+                            Date = new DateTime(2023, 4, 9, 13, 39, 43, 815, DateTimeKind.Local).AddTicks(3504),
                             EventType = "TestEventType1",
                             ImageSrcs = "[\"/images/event images/image 1.avif\",\"/images/event images/image 2.avif\"]",
                             Location = "TestEvent1Location",
@@ -77,7 +77,7 @@ namespace TicketHive_MadCats.Server.Data.MigrationsEventTicket
                         new
                         {
                             Id = 2,
-                            Date = new DateTime(2023, 4, 4, 9, 51, 40, 496, DateTimeKind.Local).AddTicks(191),
+                            Date = new DateTime(2023, 4, 9, 13, 39, 43, 815, DateTimeKind.Local).AddTicks(3559),
                             EventType = "TestEventType2",
                             ImageSrcs = "[\"/images/event images/image 3.avif\",\"/images/event images/image 4.avif\"]",
                             Location = "TestEvent2Location",
@@ -98,8 +98,9 @@ namespace TicketHive_MadCats.Server.Data.MigrationsEventTicket
                     b.Property<int>("EventModelId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -112,25 +113,25 @@ namespace TicketHive_MadCats.Server.Data.MigrationsEventTicket
                         {
                             Id = 1,
                             EventModelId = 1,
-                            UserId = 1
+                            Username = "admin"
                         },
                         new
                         {
                             Id = 2,
                             EventModelId = 1,
-                            UserId = 1
+                            Username = "admin"
                         },
                         new
                         {
                             Id = 3,
                             EventModelId = 2,
-                            UserId = 2
+                            Username = "admin"
                         },
                         new
                         {
                             Id = 4,
                             EventModelId = 2,
-                            UserId = 1
+                            Username = "user"
                         });
                 });
 

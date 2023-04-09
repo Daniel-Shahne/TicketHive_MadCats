@@ -15,11 +15,9 @@ namespace TicketHive_MadCats.Shared.Models
         [JsonProperty("id")]
         public int Id { get; set; }
 
-        // Referenses to an IdentityUser's Id
-        // but is NOT a navigation property
-        [Required]
-        [JsonProperty("userId")]
-        public int UserId { get; set; }
+
+        [JsonProperty("username")]
+        public string Username { get; set; } = null!;
 
         // Navigation property and its id
         [JsonProperty("eventModelId")]

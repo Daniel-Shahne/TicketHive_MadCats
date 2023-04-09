@@ -15,24 +15,25 @@ namespace TicketHive_MadCats.Server.Repos.Repos
             _context = context;
         }
 
-        // TODO: Check which error occurs if primary key conflicts
-        public async Task<TicketModel?> CreateTicket(TicketModel ticketModel)
+        // Apparently EFC only saves all the values if no issues occured,
+        // otherwise none are added.
+        public async Task<bool> CreateTickets(List<TicketModel> ticketModel)
         {
             try
             {
-                _context.Tickets.Add(ticketModel);
+                _context.Tickets.AddRange(ticketModel);
                 await _context.SaveChangesAsync();
-                return ticketModel;
+                return true;
             }
             catch(DbUpdateException ex)
             {
-                return null;
+                return false;
             }
         }
 
-        public async Task<List<TicketModel>> GetAllTicketsByUserId(int userId)
+        public async Task<List<TicketModel>> GetAllTicketsByUserName(string userName)
         {
-            return await _context.Tickets.Where(t => t.UserId == userId)
+            return await _context.Tickets.Where(t => t.Username == userName)
                                          .Include(t => t.EventModel)
                                          .ToListAsync();
         }
