@@ -18,7 +18,7 @@ namespace TicketHive_MadCats.Server.Repos.RepoInterfaces
         /// 
         /// </summary>
         /// <returns>Returns all ticketes</returns>
-        public Task<List<TicketModel>> GetAllTicketsByUserId(int userId);
+        public Task<List<TicketModel>> GetAllTicketsByUserName(string userName);
 
         /// <summary>
         /// Creates new tickets. This is not necessarily an admin

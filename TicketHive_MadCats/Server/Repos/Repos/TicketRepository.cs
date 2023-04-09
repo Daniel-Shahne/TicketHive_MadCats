@@ -31,9 +31,9 @@ namespace TicketHive_MadCats.Server.Repos.Repos
             }
         }
 
-        public async Task<List<TicketModel>> GetAllTicketsByUserId(int userId)
+        public async Task<List<TicketModel>> GetAllTicketsByUserName(string userName)
         {
-            return await _context.Tickets.Where(t => t.UserId == userId)
+            return await _context.Tickets.Where(t => t.Username == userName)
                                          .Include(t => t.EventModel)
                                          .ToListAsync();
         }

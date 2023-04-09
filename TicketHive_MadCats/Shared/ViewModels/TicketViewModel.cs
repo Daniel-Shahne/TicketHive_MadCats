@@ -14,8 +14,8 @@ namespace TicketHive_MadCats.Shared.ViewModels
         [JsonProperty("id")]
         public int Id { get; set; }
 
-        [JsonProperty("userId")]
-        public int UserId { get; set; }
+        [JsonProperty("username")]
+        public string? Username { get; set; }
 
         [JsonProperty("eventModelId")]
         public int EventModelId { get; set; }
@@ -24,7 +24,7 @@ namespace TicketHive_MadCats.Shared.ViewModels
         public TicketViewModel(TicketModel model)
         {
             this.Id = model.Id;
-            this.UserId = model.UserId;
+            this.Username = model.Username;
             this.EventModelId = model.EventModelId;
         }
 

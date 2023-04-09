@@ -59,12 +59,12 @@ namespace TicketHive_MadCats.Server.Testers
                     {
                         new TicketModel
                         {
-                            UserId = 1,
+                            Username = "admin",
                             EventModelId = 1
                         },
                         new TicketModel
                         {
-                            UserId = 1,
+                            Username = "admin",
                             EventModelId = 1
                         }
                     }

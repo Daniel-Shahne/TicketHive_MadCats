@@ -31,7 +31,8 @@ namespace TicketHive_MadCats.Client.Testers
             // If user is not authenticated: fail immediately
             if (!user.Identity.IsAuthenticated) return false;
 
-
+            // Gets the username to send with request
+            var userName = user.Identity.Name;
 
             // ---------------------- Get one ----------------------------
             var getOneResponse = await httpClient.GetAsync("api/Tickets/Ticket1");
@@ -45,7 +46,7 @@ namespace TicketHive_MadCats.Client.Testers
 
 
             // --------------- Get one users tickets ---------------------
-            var getAllResponse = await httpClient.GetAsync("api/Tickets/User1");
+            var getAllResponse = await httpClient.GetAsync($"api/Tickets/Username{userName}");
             var getAllStatus = getAllResponse.StatusCode;
             if (getAllStatus != System.Net.HttpStatusCode.OK) { return false; }
 
@@ -59,8 +60,6 @@ namespace TicketHive_MadCats.Client.Testers
             // For saving the posted tickets Id for deletion
             int createdTicketId = 0;
 
-            // Gets the username to send with request
-            var userName = user.Identity.Name;
             // Sends the request
             var postTicketResponse = await httpClient.PostAsync($"api/Tickets/{userName}books1times2", null);
             if(postTicketResponse.StatusCode != System.Net.HttpStatusCode.OK) { return false; };

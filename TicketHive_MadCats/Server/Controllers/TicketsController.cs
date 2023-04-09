@@ -50,12 +50,12 @@ namespace TicketHive_MadCats.Server.Controllers
 
 
 
-        // GET api/Tickets/5Tickets
-        [HttpGet("User{id}")]
+        // GET api/Tickets/UsernameAdmin
+        [HttpGet("Username{userName}")]
         [Authorize]
-        public async Task<ActionResult<List<TicketViewModel>>> GetUserTickets(int id)
+        public async Task<ActionResult<List<TicketViewModel>>> GetUserTickets(string userName)
         {
-            List<TicketModel> listOfTicketModel = await ticketRepo.GetAllTicketsByUserId(id);
+            List<TicketModel> listOfTicketModel = await ticketRepo.GetAllTicketsByUserName(userName);
             if (listOfTicketModel.Any())
             {
                 List<TicketViewModel> listOfTicketViewModel = listOfTicketModel.Select(x => new TicketViewModel(x)).ToList();
@@ -79,7 +79,7 @@ namespace TicketHive_MadCats.Server.Controllers
 
             // TODO REMOVE THIS, ONLY FOR TESTING GETTING USERID
             int userId = 0;
-            return Conflict();
+            return Ok();
 
             // Returns NotFound if no event was found of that id
             EventModel? eventToBook = await eventRepo.GetOneEventById(eventId);
@@ -103,7 +103,7 @@ namespace TicketHive_MadCats.Server.Controllers
                 // written so i choose this method for simplicity
                 TicketModel newTicket = new()
                 {
-                    UserId = userId,
+                    Username = userName,
                     EventModelId = eventId,
                 };
                 listOfTicketsToBook.Add(newTicket);

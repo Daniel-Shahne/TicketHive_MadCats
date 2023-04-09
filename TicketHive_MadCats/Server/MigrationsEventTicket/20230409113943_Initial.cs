@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace TicketHive_MadCats.Server.Data.MigrationsEventTicket
+namespace TicketHive_MadCats.Server.MigrationsEventTicket
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -38,7 +38,7 @@ namespace TicketHive_MadCats.Server.Data.MigrationsEventTicket
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EventModelId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -57,19 +57,19 @@ namespace TicketHive_MadCats.Server.Data.MigrationsEventTicket
                 columns: new[] { "Id", "Date", "EventType", "ImageSrcs", "Location", "MaxTickets", "Name", "TicketPrice" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2023, 4, 4, 9, 51, 40, 496, DateTimeKind.Local).AddTicks(141), "TestEventType1", "[\"/images/event images/image 1.avif\",\"/images/event images/image 2.avif\"]", "TestEvent1Location", 5, "TestEvent1", 100 },
-                    { 2, new DateTime(2023, 4, 4, 9, 51, 40, 496, DateTimeKind.Local).AddTicks(191), "TestEventType2", "[\"/images/event images/image 3.avif\",\"/images/event images/image 4.avif\"]", "TestEvent2Location", 2, "TestEvent2", 100 }
+                    { 1, new DateTime(2023, 4, 9, 13, 39, 43, 815, DateTimeKind.Local).AddTicks(3504), "TestEventType1", "[\"/images/event images/image 1.avif\",\"/images/event images/image 2.avif\"]", "TestEvent1Location", 5, "TestEvent1", 100 },
+                    { 2, new DateTime(2023, 4, 9, 13, 39, 43, 815, DateTimeKind.Local).AddTicks(3559), "TestEventType2", "[\"/images/event images/image 3.avif\",\"/images/event images/image 4.avif\"]", "TestEvent2Location", 2, "TestEvent2", 100 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Tickets",
-                columns: new[] { "Id", "EventModelId", "UserId" },
+                columns: new[] { "Id", "EventModelId", "Username" },
                 values: new object[,]
                 {
-                    { 1, 1, 1 },
-                    { 2, 1, 1 },
-                    { 3, 2, 2 },
-                    { 4, 2, 1 }
+                    { 1, 1, "admin" },
+                    { 2, 1, "admin" },
+                    { 3, 2, "admin" },
+                    { 4, 2, "user" }
                 });
 
             migrationBuilder.CreateIndex(
