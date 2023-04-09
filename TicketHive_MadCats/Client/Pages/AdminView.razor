@@ -1,0 +1,51 @@
+﻿@page "/AdminView"
+@attribute [Authorize(Roles = "Admin")]
+
+@using Microsoft.AspNetCore.Authorization;
+@using TicketHive_MadCats.Client.Testers;
+@using TicketHive_MadCats.Server.Testers;
+@inject HttpClient client
+@inject AuthenticationStateProvider authStateProvider
+
+<h3>AdminView</h3>
+
+<button @onclick="testEventEndpoints">Test all endpoints</button>
+
+<br />
+<label for="ticketDeleteNumberInput">Id of ticket to delete (0 if no deletion)</label>
+<input id="ticketDeleteNumberInput" type="number" @bind="ticketToDelete"/>
+
+<br />
+<label for="testPostCheckbox">Test booking 2 tickets to event 1 (maxtickets 5)</label>
+<input id="testPostCheckbox" type="checkbox" @bind="testPost" />
+
+<div>Event API test result: @eventApiTestStatus</div>
+<div>Tickets API test result: @ticketApiTestStatus</div>
+
+@code {
+    // Injicerar både dessa för användning i ApiTesters
+    [Inject]
+    public HttpClient clientInCode { get; set; }
+    [Inject]
+    public AuthenticationStateProvider authInCode { get; set; }
+
+    // Binds to id of ticket to delete
+    public int ticketToDelete { get; set; } = 0;
+
+    // Binds to checking posting or not
+    public bool testPost { get; set; } = false;
+
+    // Används för att visa testernas status på UI't som en bool
+    public bool? eventApiTestStatus = null;
+    public bool? ticketApiTestStatus = null;
+
+    // Testar alla endpoints med testers instanser
+    public async Task testEventEndpoints()
+    {
+        EventApiTester eventTester = new(authInCode, clientInCode);
+        eventApiTestStatus = await eventTester.testEndpoints();
+
+        TicketsApiTester ticketTester = new(authInCode, clientInCode);
+        ticketApiTestStatus = await ticketTester.testEndpoints(ticketToDelete, testPost);
+    }
+}
