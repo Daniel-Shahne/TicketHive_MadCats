@@ -74,12 +74,10 @@ namespace TicketHive_MadCats.Server.Controllers
         [Authorize]
         public async Task<ActionResult> Post(string userName, int eventId, int quantity)
         {
+            // Checks if there is a valid user for that username
             var user = await userManager.FindByNameAsync(userName);
             if (user == null) { return Unauthorized($"No user with name {userName} found"); }
-
-            // TODO REMOVE THIS, ONLY FOR TESTING GETTING USERID
-            int userId = 0;
-            return Ok();
+            
 
             // Returns NotFound if no event was found of that id
             EventModel? eventToBook = await eventRepo.GetOneEventById(eventId);
@@ -126,9 +124,11 @@ namespace TicketHive_MadCats.Server.Controllers
         // DELETE api/<TicketsController>/5
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<bool> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return await ticketRepo.DeleteTicket(id);
+            bool success = await ticketRepo.DeleteTicket(id);
+            if (success) { return Ok(); }
+            else return NotFound();
         }
     }
 }

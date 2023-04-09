@@ -57,12 +57,26 @@ namespace TicketHive_MadCats.Client.Testers
 
 
             // -------------------- Post a ticket ---------------------
-            // For saving the posted tickets Id for deletion
-            int createdTicketId = 0;
+            // IS VERIFIED VIA MANUALLY CHECKING THE DATABASE WITH SSMS
+            // THE RETURN VALUE ONLY INDICATES SUCCESS OR FAIL
 
-            // Sends the request
+            // Sends a valid booking request to book two tickets to event 1
             var postTicketResponse = await httpClient.PostAsync($"api/Tickets/{userName}books1times2", null);
             if(postTicketResponse.StatusCode != System.Net.HttpStatusCode.OK) { return false; };
+
+
+
+            // ------------------- Delete a ticket --------------------
+            // Cant automatically delete a ticket since cant automatically
+            // retrieve the created ticket int's either. So to test deleting
+            // a ticket you have to manually uncomment, hardcode an int, and
+            // check SSMS for validation
+
+            // Check SSMS after this line is run to check if entry is deleted
+            var deleteTicketResponse = await httpClient.DeleteAsync("api/Tickets/3");
+
+            // Check this status in debugger to see if it matches
+            var deleteTicketStatus = deleteTicketResponse.StatusCode;
 
             // If no tests failed return true
             return true;
