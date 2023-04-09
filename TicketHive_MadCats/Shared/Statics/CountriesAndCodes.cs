@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace TicketHive_MadCats.Shared.Statics
 {
+    // TODO: The lists and dictionaries are pulled from bing ai and are
+    // both incomplete and not in agreement. Needs to be manually checked.
     public static class CountriesAndCodes
     {
         // Simple list of european countries
@@ -57,6 +59,7 @@ namespace TicketHive_MadCats.Shared.Statics
             "Ukraine",
             "United Kingdom"
         };
+
         // Countries and their 3 letter abbreviation
         private static Dictionary<string, string> europeanCountriesAndAbbreviations = new Dictionary<string, string>()
         {

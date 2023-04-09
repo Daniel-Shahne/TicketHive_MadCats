@@ -18,8 +18,6 @@ public class EventRepository : IEventRepo
         _context = context;
     }
 
-    // TODO: Check which error occurs if trying to add an already
-    // existing event or if primary key conflicts
     public async Task<EventModel?> CreateEvent(EventModel model)
     {
         try
