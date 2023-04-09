@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TicketHive_MadCats.Shared.Models
 {
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<ConvertApiResponse>(myJsonResponse);
+    // ConvertApiResponse myDeserializedClass = JsonConvert.DeserializeObject<ConvertApiResponse>(myJsonResponse);
 
     // Make calls to https://api.apilayer.com/exchangerates_data/convert with params
     // apikey (in header)
