@@ -60,6 +60,7 @@ namespace TicketHive_MadCats.Client.Testers
             int createdTicketId = 0;
 
             var postTicketResponse = await httpClient.PostAsync("api/Tickets/1times2", null);
+            if(postTicketResponse.StatusCode != System.Net.HttpStatusCode.OK) { return false; };
 
             // If no tests failed return true
             return true;

@@ -20,7 +20,6 @@ namespace TicketHive_MadCats.Server.Controllers
         private readonly ITicketRepo ticketRepo;
         private readonly IEventRepo eventRepo;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly AuthenticationStateProvider authStateProvider;
 
         public TicketsController(ITicketRepo ticketRepo, IEventRepo eventRepo, UserManager<ApplicationUser> userManager)
         {
@@ -75,8 +74,25 @@ namespace TicketHive_MadCats.Server.Controllers
         [Authorize]
         public async Task<ActionResult> Post(int eventId, int quantity)
         {
-            // Gets the current logged in users id
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // TODO: THIS DOESNT WORK BECAUSE INJECTING AUTHENTICATION STATE PROVIDER FUCKS UP ENDPOINTS
+            // Check if an user is logged in, and returns error codes if
+            // something went wrong with logging in.
+            //var state = await authStateProvider.GetAuthenticationStateAsync();
+            //if (state is null) return Unauthorized("Couldnt get an authentication state");
+            //var claimsPrincipal = state.User;
+            //if (claimsPrincipal is null) return Unauthorized("Couldnt get the claims principal");
+            //ApplicationUser? loggedInUser = await userManager.GetUserAsync(claimsPrincipal);
+            //if (loggedInUser is null) return Unauthorized("Couldnt get application user object");
+            //// Gets the logged in users name
+            //string username = loggedInUser.UserName;
+
+            // Solution 2
+            var test2id = userManager.GetUserId(User);
+            var aplUser2 = await userManager.FindByIdAsync(test2id);
+
+            // Solution 1
+            var applicationUser = await userManager.GetUserAsync(User);
+            if (applicationUser is null) { return Unauthorized("Coudl not get application user"); }
 
             // TODO REMOVE THIS, ONLY FOR TESTING GETTING USERID
             int userId = 0;
