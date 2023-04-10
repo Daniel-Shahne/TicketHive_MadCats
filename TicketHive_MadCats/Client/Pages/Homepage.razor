@@ -1,12 +1,13 @@
 ﻿@page "/Homepage"
+@inherits LayoutComponentBase
 @using Newtonsoft.Json;
+@using System.Security.Claims;
 @using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject AuthenticationStateProvider authStateProvider
 @inject HttpClient injectedClient
-@inject NavigationManager navMan
 
-<h1>Homepage</h1>
+<h3>Homepage</h3>
 <div>
     <label>Search for events:</label>
     <input type="text" @oninput="FilterEvent" />
@@ -34,7 +35,7 @@
 
 <div>
     @*Visar bokningar man gjort*@
-    <h2>Booked tickets:</h2>
+    <h1>Booked tickets:</h1>
     @if (bookedTickets != null)
     {
         foreach (var ticket in bookedTickets)
@@ -54,6 +55,7 @@
     protected HttpClient codeClient { get; set; }
     [Inject]
     public AuthenticationStateProvider authenticationStateProvider { get; set; }
+    private string userName;
 
     //Tanken är att filtrera events
     private List<EventViewModel>? allEvents = new();
@@ -65,8 +67,11 @@
     protected override async Task OnInitializedAsync()
     {
         allEvents = await GetAllEvents();
-        bookedTickets = await GetBookedTickets();
         events = allEvents;
+        var state = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+        userName = user.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+        bookedTickets = await GetBookedTickets();
     }
 
 
@@ -85,45 +90,25 @@
 
     public async Task<List<TicketViewModel>> GetBookedTickets()
     {
-        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity?.IsAuthenticated ?? false)
+        try
         {
-            var response = await codeClient.GetAsync($"api/Tickets/user/{user.Identity.Name}");
+            var response = await codeClient.GetAsync($"api/Tickets/Username{userName}");
             var statusCode = response.StatusCode;
             if (statusCode == System.Net.HttpStatusCode.OK)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                bookedTickets = JsonConvert.DeserializeObject<List<TicketViewModel>>(responseBody);
+                List<TicketViewModel>? bookedTickets = JsonConvert.DeserializeObject<List<TicketViewModel?>>(responseBody);
                 return bookedTickets;
             }
+            return null;
         }
-        return null;
+        catch (Exception ex)
+        {
+            // Log the error or display an error message to the user
+            Console.WriteLine($"Error getting booked tickets: {ex.Message}");
+            return null;
+        }
     }
-
-
-    //public async Task<List<TicketViewModel>> GetBookedTickets()
-    //{
-    //    try
-    //    {
-    //        var response = await codeClient.GetAsync("api/Tickets");
-    //        var statusCode = response.StatusCode;
-    //        if (statusCode == System.Net.HttpStatusCode.OK)
-    //        {
-    //            var responseBody = await response.Content.ReadAsStringAsync();
-    //            bookedTickets = JsonConvert.DeserializeObject<List<TicketViewModel?>>(responseBody);
-    //            return bookedTickets;
-    //        }
-    //        return null;
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        // Log the error or display an error message to the user
-    //        Console.WriteLine($"Error getting booked tickets: {ex.Message}");
-    //        return null;
-    //    }
-    //}
 
     private void FilterEvent(ChangeEventArgs e)
     {
