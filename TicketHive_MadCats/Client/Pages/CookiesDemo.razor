@@ -1,0 +1,95 @@
+﻿@page "/CookiesDemo"
+
+@using Microsoft.JSInterop
+@using TicketHive_MadCats.Client.Cookies;
+@inject IJSRuntime JSRuntime
+
+@*Denna sida visar hur cookies kan dynamiskt användas*@
+
+<h3>CookiesDemo</h3>
+
+<button @onclick="testJsRuntime">Do stuff with cookies</button>
+<div>From JS test method: @testMessage</div>
+
+<br />
+<button @onclick="CreateCookie">Create a populated cookie</button>
+
+<br />
+<button @onclick="CreateEmptyCookie">Create an empty cookie</button>
+
+
+<br />
+<button @onclick="UpdateCookie">Update the cookie with a value</button>
+<label for="eventName"> Name of event to add to cart</label>
+<input id="eventName" @bind="EventName"/>
+<label for="eventName"> Quantity of event to add to cart</label>
+<input id="eventName" type="number" @bind="EventQuantity" />
+
+<br />
+<button @onclick="ReadCookie">Read the cookie</button>
+
+@code {
+    // Variables to contain stuff that UI displays
+    public string? testMessage;
+
+    // Bound elements to hold input
+    public string EventName { get; set; }
+    public int EventQuantity { get; set; }
+
+    // IJSRuntime and cookieInt 
+    [Inject]
+    public IJSRuntime jS { get; set; }
+
+    public CookieInterpreter? cookieInt;
+
+    // Used to create the cookie first time
+    public Dictionary<string, int> cartDict = new()
+    {
+        {"Rock Concert", 2},
+        {"Latino Concert", 1}
+    };
+
+    // Used to retrieve the cookies value. Is null to begin with
+    public Dictionary<string, int>? retrievedCart;
+
+
+    // Need to use this to make sure IJSRuntime is avaliable for use in
+    // CookieInterpreter instantiation
+    protected override async Task OnParametersSetAsync()
+    {
+        cookieInt = new(jS);
+    }
+
+    // Simply prints a message to a div to see if JSRuntime is working
+    public async Task testJsRuntime()
+    {
+        testMessage = await cookieInt.TestJsRuntime();
+    }
+
+    // Creates the cookie (UpdateCookie will also create a cookie if
+    // it doesnt exist)
+    public async Task CreateCookie()
+    {
+        await cookieInt.UpdateCookie(cartDict);
+    }
+
+    public async Task CreateEmptyCookie()
+    {
+        await cookieInt.CreateCookie();
+    }
+
+    // Adds a new kvp to the cartDict and uses this dict to update
+    // the cookie
+    public async Task UpdateCookie()
+    {
+        // Adds a new key value pair to the dict
+        cartDict.Add(EventName, EventQuantity);
+        await cookieInt.UpdateCookie(cartDict);
+    }
+
+    // Reads the cookie and sets retirevedCart to its value
+    public async Task ReadCookie()
+    {
+        retrievedCart = await cookieInt.ReadCookie();
+    }
+}
