@@ -12,6 +12,7 @@ using TicketHive_MadCats.Shared.ViewModels;
 
 namespace TicketHive_MadCats.Server.Controllers
 {
+    // api/Events
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -39,6 +40,7 @@ namespace TicketHive_MadCats.Server.Controllers
             return Ok(listOfViewModels);
         }
 
+        // api/Events/3
         // GET api/<EventsController>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<EventViewModel?>> Get(int id)
@@ -52,7 +54,7 @@ namespace TicketHive_MadCats.Server.Controllers
             else return NotFound();
         }
 
-        // POST api/<EventsController>
+        // POST api/Events
         [HttpPost]
         public async Task<ActionResult> Post([FromBody]string newtonsoftModel)
         {

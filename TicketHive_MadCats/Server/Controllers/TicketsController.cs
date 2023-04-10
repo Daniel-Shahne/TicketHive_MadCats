@@ -13,15 +13,16 @@ using TicketHive_MadCats.Shared.ViewModels;
 
 namespace TicketHive_MadCats.Server.Controllers
 {
+    // api/Tickets
     [Route("api/[controller]")]
     [ApiController]
     public class TicketsController : ControllerBase
     {
         private readonly ITicketRepo ticketRepo;
         private readonly IEventRepo eventRepo;
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly UserManager<CustomUser> userManager;
 
-        public TicketsController(ITicketRepo ticketRepo, IEventRepo eventRepo, UserManager<ApplicationUser> userManager)
+        public TicketsController(ITicketRepo ticketRepo, IEventRepo eventRepo, UserManager<CustomUser> userManager)
         {
             this.ticketRepo = ticketRepo;
             this.eventRepo = eventRepo;
@@ -30,8 +31,7 @@ namespace TicketHive_MadCats.Server.Controllers
 
 
 
-
-        // GET api/<TicketsController>/5
+        // api/Tickets/Ticket5
         [HttpGet("Ticket{id}")]
         [Authorize]
         public async Task<ActionResult<TicketViewModel?>> GetOne(int id)
