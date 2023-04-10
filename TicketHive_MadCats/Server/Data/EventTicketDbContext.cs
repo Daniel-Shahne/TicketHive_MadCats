@@ -40,10 +40,23 @@ namespace TicketHive_MadCats.Server.Data
                 "/images/event images/image 3.avif",
                 "/images/event images/image 4.avif"
             };
+            List<string> TE3LS = new()
+            {
+                "/images/event images/image 5.avif",
+                "/images/event images/image 6.avif"
+            };
+            List<string> TE4LS = new()
+            {
+                "/images/event images/image 7.avif",
+                "/images/event images/image 8.avif"
+            };
             // TE1S = Test eventmodel 1 string
             string TE1S = JsonConvert.SerializeObject(TE1LS);
             string TE2S = JsonConvert.SerializeObject(TE2LS);
-            
+            string TE3S = JsonConvert.SerializeObject(TE3LS);
+            string TE4S = JsonConvert.SerializeObject(TE4LS);
+
+
             // Seeding data for eventmodel. TicketModels have to be
             // seeded separately in another modelbuilder entity blablabla
             // and through the foreign key (ID) the relation is created
@@ -51,10 +64,10 @@ namespace TicketHive_MadCats.Server.Data
                 new EventModel()
                 {
                     Id = 1,
-                    Name = "TestEvent1",
-                    EventType = "TestEventType1",
+                    Name = "Rock Concert",
+                    EventType = "Concert",
                     TicketPrice = 100,
-                    Location = "TestEvent1Location",
+                    Location = "Malmö, Sweden",
                     Date = DateTime.Now,
                     MaxTickets = 5,
                     ImageSrcs = TE1S
@@ -62,13 +75,35 @@ namespace TicketHive_MadCats.Server.Data
                 new EventModel()
                 {
                     Id = 2,
-                    Name = "TestEvent2",
-                    EventType = "TestEventType2",
-                    TicketPrice = 100,
-                    Location = "TestEvent2Location",
+                    Name = "Latino Concert",
+                    EventType = "Concert",
+                    TicketPrice = 50,
+                    Location = "Stockholm, Sweden",
                     Date = DateTime.Now,
                     MaxTickets = 2,
                     ImageSrcs= TE2S
+                },
+                new EventModel()
+                {
+                    Id = 3,
+                    Name = "Dreamhack",
+                    EventType = "Tournament",
+                    TicketPrice = 5000,
+                    Location = "Krakow, Poland",
+                    Date = DateTime.Now,
+                    MaxTickets = 100,
+                    ImageSrcs = TE3S
+                },
+                new EventModel()
+                {
+                    Id = 4,
+                    Name = "Art Exhibition",
+                    EventType = "Exhibition",
+                    TicketPrice = 5,
+                    Location = "Berlin, Germany",
+                    Date = DateTime.Now,
+                    MaxTickets = 20,
+                    ImageSrcs = TE4S
                 }
                 );
 

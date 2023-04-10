@@ -13,6 +13,7 @@ using TicketHive_MadCats.Shared.ViewModels;
 
 namespace TicketHive_MadCats.Server.Controllers
 {
+    // api/Tickets
     [Route("api/[controller]")]
     [ApiController]
     public class TicketsController : ControllerBase
@@ -30,8 +31,7 @@ namespace TicketHive_MadCats.Server.Controllers
 
 
 
-
-        // GET api/<TicketsController>/5
+        // api/Tickets/Ticket5
         [HttpGet("Ticket{id}")]
         [Authorize]
         public async Task<ActionResult<TicketViewModel?>> GetOne(int id)

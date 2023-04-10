@@ -57,8 +57,10 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                 columns: new[] { "Id", "Date", "EventType", "ImageSrcs", "Location", "MaxTickets", "Name", "TicketPrice" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2023, 4, 9, 13, 39, 43, 815, DateTimeKind.Local).AddTicks(3504), "TestEventType1", "[\"/images/event images/image 1.avif\",\"/images/event images/image 2.avif\"]", "TestEvent1Location", 5, "TestEvent1", 100 },
-                    { 2, new DateTime(2023, 4, 9, 13, 39, 43, 815, DateTimeKind.Local).AddTicks(3559), "TestEventType2", "[\"/images/event images/image 3.avif\",\"/images/event images/image 4.avif\"]", "TestEvent2Location", 2, "TestEvent2", 100 }
+                    { 1, new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(5946), "Concert", "[\"/images/event images/image 1.avif\",\"/images/event images/image 2.avif\"]", "Malmö, Sweden", 5, "Rock Concert", 100 },
+                    { 2, new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(6026), "Concert", "[\"/images/event images/image 3.avif\",\"/images/event images/image 4.avif\"]", "Stockholm, Sweden", 2, "Latino Concert", 50 },
+                    { 3, new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(6032), "Tournament", "[\"/images/event images/image 5.avif\",\"/images/event images/image 6.avif\"]", "Krakow, Poland", 100, "Dreamhack", 5000 },
+                    { 4, new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(6037), "Exhibition", "[\"/images/event images/image 7.avif\",\"/images/event images/image 8.avif\"]", "Berlin, Germany", 20, "Art Exhibition", 5 }
                 });
 
             migrationBuilder.InsertData(

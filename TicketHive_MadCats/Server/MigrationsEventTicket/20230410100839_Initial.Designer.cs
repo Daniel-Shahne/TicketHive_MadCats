@@ -12,7 +12,7 @@ using TicketHive_MadCats.Server.Data;
 namespace TicketHive_MadCats.Server.MigrationsEventTicket
 {
     [DbContext(typeof(EventTicketDbContext))]
-    [Migration("20230409113943_Initial")]
+    [Migration("20230410100839_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -66,24 +66,46 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                         new
                         {
                             Id = 1,
-                            Date = new DateTime(2023, 4, 9, 13, 39, 43, 815, DateTimeKind.Local).AddTicks(3504),
-                            EventType = "TestEventType1",
+                            Date = new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(5946),
+                            EventType = "Concert",
                             ImageSrcs = "[\"/images/event images/image 1.avif\",\"/images/event images/image 2.avif\"]",
-                            Location = "TestEvent1Location",
+                            Location = "Malmö, Sweden",
                             MaxTickets = 5,
-                            Name = "TestEvent1",
+                            Name = "Rock Concert",
                             TicketPrice = 100
                         },
                         new
                         {
                             Id = 2,
-                            Date = new DateTime(2023, 4, 9, 13, 39, 43, 815, DateTimeKind.Local).AddTicks(3559),
-                            EventType = "TestEventType2",
+                            Date = new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(6026),
+                            EventType = "Concert",
                             ImageSrcs = "[\"/images/event images/image 3.avif\",\"/images/event images/image 4.avif\"]",
-                            Location = "TestEvent2Location",
+                            Location = "Stockholm, Sweden",
                             MaxTickets = 2,
-                            Name = "TestEvent2",
-                            TicketPrice = 100
+                            Name = "Latino Concert",
+                            TicketPrice = 50
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Date = new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(6032),
+                            EventType = "Tournament",
+                            ImageSrcs = "[\"/images/event images/image 5.avif\",\"/images/event images/image 6.avif\"]",
+                            Location = "Krakow, Poland",
+                            MaxTickets = 100,
+                            Name = "Dreamhack",
+                            TicketPrice = 5000
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Date = new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(6037),
+                            EventType = "Exhibition",
+                            ImageSrcs = "[\"/images/event images/image 7.avif\",\"/images/event images/image 8.avif\"]",
+                            Location = "Berlin, Germany",
+                            MaxTickets = 20,
+                            Name = "Art Exhibition",
+                            TicketPrice = 5
                         });
                 });
 
