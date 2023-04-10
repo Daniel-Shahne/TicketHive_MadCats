@@ -1,0 +1,139 @@
+﻿@page "/Homepage"
+@using Newtonsoft.Json;
+@using TicketHive_MadCats.Shared.Models;
+@using TicketHive_MadCats.Shared.ViewModels;
+@inject AuthenticationStateProvider authStateProvider
+@inject HttpClient injectedClient
+@inject NavigationManager navMan
+
+<h1>Homepage</h1>
+<div>
+    <label>Search for events:</label>
+    <input type="text" @oninput="FilterEvent" />
+</div>
+
+<div>
+    @*Ska visa mest populära evenemang*@
+    @if(events != null)
+    {
+        foreach (var events in events)
+        {
+            <a href="details/@events.Id">
+                <div>
+                    <h2>@events.Name, @events.EventType, @events.Location</h2>
+                    <hr />
+                </div>
+            </a>
+        }
+    }
+    else
+    {
+        <h3>Loading ....</h3>
+    }
+</div>
+
+<div>
+    @*Visar bokningar man gjort*@
+    <h2>Booked tickets:</h2>
+    @if (bookedTickets != null)
+    {
+        foreach (var ticket in bookedTickets)
+        {
+            <p>@ticket.Username</p>
+        }
+    }
+    else
+    {
+        <h3>No booked tickets found.</h3>
+    }
+</div>
+
+@code {
+
+    [Inject]
+    protected HttpClient codeClient { get; set; }
+    [Inject]
+    public AuthenticationStateProvider authenticationStateProvider { get; set; }
+
+    //Tanken är att filtrera events
+    private List<EventViewModel>? allEvents = new();
+    private List<EventViewModel>? events = new();
+    private List<TicketViewModel>? bookedTickets = new();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        allEvents = await GetAllEvents();
+        bookedTickets = await GetBookedTickets();
+        events = allEvents;
+    }
+
+
+    public async Task<List<EventViewModel>> GetAllEvents()
+    {
+        var response = await codeClient.GetAsync("api/Events");
+        var statusCode = response.StatusCode;
+        if (statusCode == System.Net.HttpStatusCode.OK)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            List<EventViewModel?> eventVM = JsonConvert.DeserializeObject<List<EventViewModel?>>(responseBody);
+            return eventVM;
+        }
+        return null;
+    }
+
+    public async Task<List<TicketViewModel>> GetBookedTickets()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated ?? false)
+        {
+            var response = await codeClient.GetAsync($"api/Tickets/user/{user.Identity.Name}");
+            var statusCode = response.StatusCode;
+            if (statusCode == System.Net.HttpStatusCode.OK)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                bookedTickets = JsonConvert.DeserializeObject<List<TicketViewModel>>(responseBody);
+                return bookedTickets;
+            }
+        }
+        return null;
+    }
+
+
+    //public async Task<List<TicketViewModel>> GetBookedTickets()
+    //{
+    //    try
+    //    {
+    //        var response = await codeClient.GetAsync("api/Tickets");
+    //        var statusCode = response.StatusCode;
+    //        if (statusCode == System.Net.HttpStatusCode.OK)
+    //        {
+    //            var responseBody = await response.Content.ReadAsStringAsync();
+    //            bookedTickets = JsonConvert.DeserializeObject<List<TicketViewModel?>>(responseBody);
+    //            return bookedTickets;
+    //        }
+    //        return null;
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        // Log the error or display an error message to the user
+    //        Console.WriteLine($"Error getting booked tickets: {ex.Message}");
+    //        return null;
+    //    }
+    //}
+
+    private void FilterEvent(ChangeEventArgs e)
+    {
+        events = new();
+        events = allEvents!.Where(p =>
+            p.Name!.ToLower().Contains(e.Value!.ToString()!.ToLower()) ||
+            p.Location.ToLower().Contains(e.Value!.ToString()!.ToLower()) ||
+            p.EventType.ToLower().Contains(e.Value!.ToString()!.ToLower())
+            ).ToList();
+
+    }
+
+}
