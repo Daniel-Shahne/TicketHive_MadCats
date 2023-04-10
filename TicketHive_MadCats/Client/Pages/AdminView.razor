@@ -4,12 +4,17 @@
 @using Microsoft.AspNetCore.Authorization;
 @using TicketHive_MadCats.Client.Testers;
 @using TicketHive_MadCats.Server.Testers;
+@using TicketHive_MadCats.Shared.Models;
+@using TicketHive_MadCats.Shared.ViewModels;
 @inject HttpClient client
+@inject NavigationManager navMan
 @inject AuthenticationStateProvider authStateProvider
+@inject IJSRuntime JSRuntime
+
 
 <h3>AdminView</h3>
 
-<button @onclick="testEventEndpoints">Test all endpoints</button>
+@*<button @onclick="testEventEndpoints">Test all endpoints</button>
 
 <br />
 <label for="ticketDeleteNumberInput">Id of ticket to delete (0 if no deletion)</label>
@@ -20,12 +25,82 @@
 <input id="testPostCheckbox" type="checkbox" @bind="testPost" />
 
 <div>Event API test result: @eventApiTestStatus</div>
-<div>Tickets API test result: @ticketApiTestStatus</div>
+<div>Tickets API test result: @ticketApiTestStatus</div>*@
+
+
+
+<EditForm Model="@eventModel" OnValidSubmit="CreateEvent">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label>Event Name</label>
+        <InputText @bind-Value="eventModel.Name" class="form-control"/>
+    </div>
+    <div>
+        <label>Event Type</label>
+        <InputText @bind-Value="eventModel.EventType" class="form-control" />
+    </div>
+    <div>
+        <label>Ticket Price</label>
+        <InputNumber @bind-Value="eventModel.TicketPrice" class="form-control" />
+    </div>
+    <div>
+        <label>Event Location</label>
+        <InputText @bind-Value="eventModel.Location" class="form-control" />
+    </div>
+    <div>
+        <label>Event Date</label>
+        <InputDate @bind-Value="eventModel.Date" class="form-control" />
+    </div>
+    <div>
+        <label>Event Images</label>
+        <InputText @bind-Value="eventModel.ImageSrcs" class="form-control" />
+    </div>
+    <div>
+        <label>Max Capacity of Event</label>
+        <InputNumber @bind-Value="eventModel.MaxTickets" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create Event</button>
+</EditForm>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Ticket Price</th>
+            <th>Max Tickets</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var evt in Events)
+        {
+            <tr>
+                <td>@evt.Name</td>
+                <td>@evt.EventType</td>
+                <td>@evt.Date.ToShortDateString()</td>
+                <td>@evt.Location</td>
+                <td>@evt.TicketPrice</td>
+                <td>@evt.MaxTickets</td>
+                <td>
+                    <button class="btn btn-danger" @onClick="() => DeleteEvent(evt)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
 
 @code {
     // Injicerar både dessa för användning i ApiTesters
     [Inject]
-    public HttpClient clientInCode { get; set; }
+    public HttpClient httpClient { get; set; }
     [Inject]
     public AuthenticationStateProvider authInCode { get; set; }
 
@@ -42,10 +117,45 @@
     // Testar alla endpoints med testers instanser
     public async Task testEventEndpoints()
     {
-        EventApiTester eventTester = new(authInCode, clientInCode);
+        EventApiTester eventTester = new(authInCode, httpClient);
         eventApiTestStatus = await eventTester.testEndpoints();
 
-        TicketsApiTester ticketTester = new(authInCode, clientInCode);
+        TicketsApiTester ticketTester = new(authInCode, httpClient);
         ticketApiTestStatus = await ticketTester.testEndpoints(ticketToDelete, testPost);
     }
+
+    private EventModel eventModel = new();
+    private List<EventModel> Events = new();
+
+    private async Task CreateEvent()
+    {
+        await httpClient.PostAsJsonAsync("api/events", eventModel);
+
+        eventModel = new EventModel();
+    }
+
+    private async Task DeleteEvent(EventModel evt)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the event '{evt.Name}'?");
+
+        if(confirmed)
+        { 
+            var response = await httpClient.DeleteAsync($"api/events/{evt.Id}");
+            if (response.IsSuccessStatusCode)
+            {
+                Events.Remove(evt);
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await EventsInList();
+    }
+
+    private async Task EventsInList()
+    {
+        Events = await httpClient.GetFromJsonAsync<List<EventModel>>("/api/events");
+    }
+
 }
