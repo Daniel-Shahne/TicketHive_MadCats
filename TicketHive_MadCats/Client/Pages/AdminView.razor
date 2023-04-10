@@ -82,14 +82,14 @@
         @foreach (var evt in Events)
         {
             <tr>
-                <td>@eventModel.Name</td>
-                <td>@eventModel.EventType</td>
-                <td>@eventModel.Date.ToShortDateString()</td>
-                <td>@eventModel.Location</td>
-                <td>@eventModel.TicketPrice</td>
-                <td>@eventModel.MaxTickets</td>
+                <td>@evt.Name</td>
+                <td>@evt.EventType</td>
+                <td>@evt.Date.ToShortDateString()</td>
+                <td>@evt.Location</td>
+                <td>@evt.TicketPrice</td>
+                <td>@evt.MaxTickets</td>
                 <td>
-                    <button class="btn btn-danger" @onclick="@(() => DeleteEvent(eventModel.Id))">Delete</button>
+                    <button class="btn btn-danger" @onclick="@(() => DeleteEvent(evt.Id))">Delete</button>
                 </td>
             </tr>
         }
@@ -136,8 +136,7 @@
     public AuthenticationStateProvider authInCode { get; set; }
 
 
-    private EventModel eventModel;
-    private EventModel eventToDelete;
+    private EventModel eventModel = new();
     private List<EventModel> Events = new();
     private string statusMessage = string.Empty;
     private string deleteStatusMessage = string.Empty;
@@ -156,6 +155,7 @@
 
         await EventsInList();
         eventModel = new EventModel();
+
     }
 
     protected override async Task OnInitializedAsync()
