@@ -53,7 +53,7 @@
     </div>
     <div>
         <label>Event Images</label>
-        <InputFile OnChange="HandleFileSelection" class="form-control" />
+        <InputText @bind-Value="eventModel.ImageSrcs" class="form-control" />
     </div>
     <div>
         <label>Max Capacity of Event</label>
@@ -155,7 +155,7 @@
 
         await EventsInList();
         eventModel = new EventModel();
-        statusMessage = "";
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -181,28 +181,6 @@
         {
             deleteStatusMessage = "Deletion was not a success.";
             return;
-        }
-    }
-
-    private async Task HandleFileSelection(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (file != null)
-        {
-            // Generate a unique filename for the uploaded file
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
-
-            // Construct the full path to save the file
-            var savePath = Path.Combine("wwwroot", "images", fileName);
-
-            // Create a FileStream to save the uploaded file
-            using var stream = new FileStream(savePath, FileMode.Create);
-
-            // Copy the uploaded file data to the FileStream
-            await file.OpenReadStream().CopyToAsync(stream);
-
-            // Set the ImageSrcs property to the relative path of the saved file
-            eventModel.ImageSrcs = "/images/event images" + fileName;
         }
     }
 
