@@ -1,0 +1,94 @@
+﻿@page "/EventPage/{Id:int}"
+@using Newtonsoft.Json;
+@using TicketHive_MadCats.Shared.ViewModels;
+@inject HttpClient client
+@inject NavigationManager navMan
+
+@if(Event != null)
+
+{
+
+    @if(Event.BookedTickets >= Event.MaxTickets)
+    {
+        <h2 class="color text-danger">  Event is fully booked!</h2>
+    }
+    else
+    {
+        <h2>Name: @Event.Name</h2>
+        <br />
+        <h2>Event type: @Event.EventType</h2>
+        <br />
+        <h2>Event Price: @Event.TicketPrice</h2>
+        <br />
+        <h2>Location: @Event.Location</h2>
+        <br />
+        <h2>Date: @Event.Date</h2>
+        <br />
+        <h2>Tickets available: @Event.MaxTickets</h2>
+        <br />
+        <button @onclick="() => navMan.NavigateTo(CartUrl)">Add to Cart</button>
+    }
+
+    @foreach(var ImgPath in ImgPaths)
+    {
+        <img src=@ImgPath >
+    }
+}
+else
+{
+    <h3>Loading events... </h3>
+}
+
+<div>
+    <button @onclick="() => navMan.NavigateTo(IndexUrl)">Go to HomePage</button>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Inject]
+    HttpClient codeClient { get; set; }
+
+    public EventViewModel? Event;
+    public List<string> ImgPaths;
+    public string IndexUrl { get; set; } = "/";
+    public string CartUrl { get; set; } = "/Cart";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Event = await GetOneEvent();
+        DeserializeImgs();
+
+    }
+
+    public void AddToCart(int Id)
+    {
+        
+    }
+
+    public void DeserializeImgs()
+    {
+        if(Event != null)
+        {
+            ImgPaths = JsonConvert.DeserializeObject<List<string>>(Event.ImageSrcs);
+        }
+    }
+
+
+    public async Task<EventViewModel?> GetOneEvent()
+    {
+        var response = await codeClient.GetAsync($"api/Events/{Id}");
+        var statusCode = response.StatusCode;
+        if (statusCode == System.Net.HttpStatusCode.OK)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            EventViewModel? eventVM = JsonConvert.DeserializeObject<EventViewModel?>(responseBody);
+            return eventVM;
+        }
+        return null; 
+
+    }
+
+
+
+}
