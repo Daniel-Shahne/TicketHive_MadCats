@@ -1,0 +1,64 @@
+﻿@page "/DemoSida"
+@using Newtonsoft.Json;
+@using TicketHive_MadCats.Shared.ViewModels;
+@inject HttpClient injectedClient
+
+@*KRÄVER ATT MAN ÄR INLOGGAD*@
+
+@*Denna sida är till för att demonstrera ett call till API som följer den sidan
+jag skrev på notion för att stegvist göra ett call till "GetOne" i TicketsController,
+d.v.s vi vill hämta en Ticket.*@
+
+@*Steg 1: Vi kollar i ticketscontroller
+
+Steg 2: GetOne passar bäst för att hämta en ticket
+
+Steg 3:
+    a: api/Tickets är adressen till HELA controllern
+    b: 
+        i: står HttpGet, så det ska vara en Get request
+        ii: står Ticket{id}, och allt som är inom {} är en parameter, något vi själva väljer. så om vi vill hämta ticket med id 1 skriver vi Ticket1
+
+Hittils är addressen api/Tickets från steg 3-a, och + /Ticket1 från steg 3-b, så totalt api/Tickets/Ticket1 för att hämta ticket med id 1
+
+    c: 
+        i: Vi hittar två return i metoden, en som ger Ok och en som ger NotFound. Så dessa är möjliga statusmeddelanden
+        ii: Vi ser från båda att det skickas tillbaka en nullable TicketViewModel (pga frågetecknet)
+
+Steg 4: Görs i @code sectionen*@
+
+<h3>DemoSida</h3>
+
+<button @onclick="getOneTicket">Get the ticket!</button>
+
+@if(gottenTicket is not null)
+{
+    <h1>Gotten ticket with id @gottenTicket.Id</h1>
+}
+
+@code {
+    // ------------------------ Steg 4a ------------------------------
+    // Vi ska ALDRIG new'a upp httpClients om inte det är absolut nödvändigt.
+    // [Inject] betyder att använda den injicerade typen, d.v.s då variabeln
+    // är av typ HttpClient så ska en @inject'ad HttpClient användas
+    [Inject]
+    protected HttpClient codeClient { get; set; }
+
+    public TicketViewModel? gottenTicket;
+
+    // ------------------- Resten av stegen ---------------------------
+    // Då det inte går att koda DIREKT i @code måste metoder skapas för varje
+    // grej. Med andra ord kan du behandla hela @code som om det var en klass
+    // du skriver kod i
+    public async Task getOneTicket()
+    {
+        var response = await codeClient.GetAsync("api/Tickets/Ticket1");
+        var statusCode = response.StatusCode;
+        if (statusCode == System.Net.HttpStatusCode.OK)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            TicketViewModel? ticketVM = JsonConvert.DeserializeObject<TicketViewModel?>(responseBody);
+            gottenTicket = ticketVM;
+        }
+    }
+}
