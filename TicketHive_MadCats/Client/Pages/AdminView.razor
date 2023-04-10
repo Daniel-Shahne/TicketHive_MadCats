@@ -2,6 +2,7 @@
 @attribute [Authorize(Roles = "Admin")]
 
 @using Microsoft.AspNetCore.Authorization;
+@using Newtonsoft.Json;
 @using TicketHive_MadCats.Client.Testers;
 @using TicketHive_MadCats.Server.Testers;
 @using TicketHive_MadCats.Shared.Models;
@@ -9,8 +10,6 @@
 @inject HttpClient client
 @inject NavigationManager navMan
 @inject AuthenticationStateProvider authStateProvider
-@inject IJSRuntime JSRuntime
-
 
 <h3>AdminView</h3>
 
@@ -63,6 +62,8 @@
     <button type="submit" class="btn btn-primary">Create Event</button>
 </EditForm>
 
+<h3>@statusMessage</h3>
+
 
 <table class="table">
     <thead>
@@ -87,18 +88,21 @@
                 <td>@evt.TicketPrice</td>
                 <td>@evt.MaxTickets</td>
                 <td>
-                    <button class="btn btn-danger" @onClick="() => DeleteEvent(evt)">Delete</button>
+                    <button class="btn btn-danger" @onClick="() => @DeleteEvent(evt.Id)">Delete</button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
+<h3>@deleteStatusMessage</h3>
 
 
 
 @code {
-    // Injicerar både dessa för användning i ApiTesters
+    
+    
+    @*// Injicerar både dessa för användning i ApiTesters
     [Inject]
     public HttpClient httpClient { get; set; }
     [Inject]
@@ -122,30 +126,35 @@
 
         TicketsApiTester ticketTester = new(authInCode, httpClient);
         ticketApiTestStatus = await ticketTester.testEndpoints(ticketToDelete, testPost);
-    }
+    }*@
+    // Injicerar både dessa för användning i ApiTesters
+
+    [Inject]
+    public HttpClient httpClient { get; set; }
+    [Inject]
+    public AuthenticationStateProvider authInCode { get; set; }
+
 
     private EventModel eventModel = new();
+    private EventModel eventToDelete;
     private List<EventModel> Events = new();
+    private string statusMessage = string.Empty;
+    private string deleteStatusMessage = string.Empty;
+    private bool confirmDeleteVisible = false;
 
     private async Task CreateEvent()
     {
-        await httpClient.PostAsJsonAsync("api/events", eventModel);
+        string modelToCreate = JsonConvert.SerializeObject(eventModel);
 
-        eventModel = new EventModel();
-    }
+        var response = await httpClient.PostAsJsonAsync("api/events", modelToCreate);
 
-    private async Task DeleteEvent(EventModel evt)
-    {
-        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete the event '{evt.Name}'?");
-
-        if(confirmed)
-        { 
-            var response = await httpClient.DeleteAsync($"api/events/{evt.Id}");
-            if (response.IsSuccessStatusCode)
-            {
-                Events.Remove(evt);
-            }
+        if (response.IsSuccessStatusCode)
+        {
+            statusMessage = "Event created successfully!";
         }
+
+        await EventsInList();
+        eventModel = new EventModel();
     }
 
     protected override async Task OnInitializedAsync()
@@ -157,5 +166,23 @@
     {
         Events = await httpClient.GetFromJsonAsync<List<EventModel>>("/api/events");
     }
+
+    private async Task DeleteEvent(int id)
+    {
+        var response = await httpClient.DeleteAsync($"/api/events/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            await EventsInList();
+            deleteStatusMessage = "Deletion is a success.";
+        }
+        else
+        {
+            deleteStatusMessage = "Deletion was not a success.";
+            return;
+        }
+    }
+
+
 
 }
