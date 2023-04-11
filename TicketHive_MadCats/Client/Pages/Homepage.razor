@@ -1,5 +1,4 @@
 ﻿@page "/Homepage"
-@inherits LayoutComponentBase
 @using Newtonsoft.Json;
 @using System.Security.Claims;
 @using TicketHive_MadCats.Shared.Models;
@@ -8,34 +7,73 @@
 @inject HttpClient injectedClient
 
 <h3>Welcome to the Homepage @userName</h3>
-<div>
-    <label>Search for events:</label>
-    <input type="text" @oninput="FilterEvent" />
+
+
+
+<label class="row text-center justify-content-center">Most popular events</label>
+<div class="row text-center justify-content-center">
+    <div class="col-3 border border-2 border-dark">
+        @if (events != null)
+        {
+            var sortedEvents = events.OrderBy(e => e.MaxTickets - e.BookedTickets);
+            foreach (var ev in sortedEvents)
+            {
+                <div class="event-item">
+                    @if (ev.BookedTickets >= ev.MaxTickets)
+                    {
+                        <h3>@ev.Name</h3>
+                        <em class="color text-danger" style="font-size: 18px">  Event is fully booked!</em>
+                    }
+                    else
+                    {
+                        <h3>@ev.Name - @ev.BookedTickets/@ev.MaxTickets tickets are booked.</h3>
+                    }
+                </div>
+            }
+        }
+    </div>
 </div>
 
-<div>
-    @*Ska visa mest populära evenemang*@
-    @if(events != null)
+<div class="row text-center justify-content-center">
+    <div class="col-3">
+        <label>Search for events:</label>
+        <input type="text" class="form-control" @oninput="FilterEvent" />
+    </div>
+</div>
+
+<div class="row text-center justify-content-center">
+    @if (events != null)
     {
         foreach (var events in events)
         {
-            <a href="details/@events.Id">
-                <div>
-                    <h2>@events.Name, @events.EventType, @events.Location</h2>
-                    <hr />
-                </div>
-            </a>
+            <div class="col-3 border border-2 border-dark m-2 p-2">
+                <a href="/EventPage/@events.Id">
+                    <h3>@events.Name</h3>
+                </a>
+                @*Ändra priset till landets egna valuta*@
+                <p>@events.TicketPrice</p>
+                <p>@events.Date</p>
+                <em>@events.Location</em>
+
+                @if (events.BookedTickets >= events.MaxTickets)
+                {
+                    <br />
+                    <em class="color text-danger" style="font-size: 18px">  Event is fully booked!</em>
+                    <br />
+                }
+
+            </div>
         }
     }
     else
     {
-        <h3>Loading ....</h3>
+        <h3>Loading events... </h3>
     }
 </div>
 
-<div>
+<div class="row text-center justify-content-center">
     @*Visar bokningar man gjort*@
-    <h1>Booked tickets:</h1>
+    <h3>Booked tickets:</h3>
     @if (ShowTicketEvent != null)
     {
         foreach (var events in ShowTicketEvent)
@@ -48,6 +86,14 @@
         <h3>No booked tickets found.</h3>
     }
 </div>
+
+<style>
+    .event-item {
+        border-bottom: 1px solid black;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+</style>
 
 @code {
 
@@ -137,7 +183,6 @@
 
     private void FilterEvent(ChangeEventArgs e)
     {
-        events = new();
         events = allEvents!.Where(p =>
             p.Name!.ToLower().Contains(e.Value!.ToString()!.ToLower()) ||
             p.Location.ToLower().Contains(e.Value!.ToString()!.ToLower()) ||
