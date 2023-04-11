@@ -1,0 +1,71 @@
+﻿@page "/BookingPage"
+@using Newtonsoft.Json;
+@using TicketHive_MadCats.Shared.ViewModels;
+@inject HttpClient client
+@inject NavigationManager navMan
+
+
+<h3>BookingPage</h3>
+<div>
+    <label>Search for events:</label>
+    <input type="text" @oninput="FilterEvent" />
+</div>
+
+<div class="row text-center justify-content-center">
+    @if (events != null)
+    {
+        foreach (var events in events)
+        {
+                    <div class="col-3 border border-2 border-dark m-2 p-2">
+                        <a href="details/@events.Id">
+                            <h3>@events.Name</h3>
+                            <p>@events.TicketPrice</p>
+                            <em>@events.Location</em>
+                        </a>
+                    </div>
+        }
+    }
+    else
+    {
+            <h3>Loading events... </h3>
+    }
+</div>
+
+@code {
+    private List<EventViewModel>? allEvents = new();
+    private List<EventViewModel>? events = new();
+    HttpClient codeClient { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        allEvents = await GetAllEvents();
+        events = allEvents;
+    }
+
+
+
+    private void FilterEvent(ChangeEventArgs e)
+    {
+        events = new();
+        events = allEvents!.Where(p =>
+            p.Name!.ToLower().Contains(e.Value!.ToString()!.ToLower()) |
+            p.Location.ToLower().Contains(e.Value!.ToString()!.ToLower()) |
+            p.EventType.ToLower().Contains(e.Value!.ToString()!.ToLower())
+            ).ToList();
+
+    }
+
+    public async Task<List<EventViewModel>> GetAllEvents()
+    {
+        var response = await codeClient.GetAsync("api/Events");
+        var statusCode = response.StatusCode;
+        if (statusCode == System.Net.HttpStatusCode.OK)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            List<EventViewModel?> eventVM = JsonConvert.DeserializeObject<List<EventViewModel?>>(responseBody);
+            return eventVM;
+        }
+        return null;
+    }
+}
+
