@@ -1,7 +1,7 @@
 ﻿@page "/BookingPage"
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Shared.ViewModels;
-@inject HttpClient client
+@inject HttpClient injectedClient
 @inject NavigationManager navMan
 
 
@@ -17,13 +17,20 @@
         foreach (var events in events)
         {
                     <div class="col-3 border border-2 border-dark m-2 p-2">
-                        <a href="details/@events.Id">
+                            <a href="/EventPage/@events.Id"></a>
                             <h3>@events.Name</h3>
                             <p>@events.TicketPrice</p>
                             <em>@events.Location</em>
-                        </a>
+                            
+                        
                     </div>
         }
+        @foreach (var ImgPath in ImgPaths)
+        {
+            <img src=@ImgPath style="">
+        }
+
+
     }
     else
     {
@@ -34,12 +41,15 @@
 @code {
     private List<EventViewModel>? allEvents = new();
     private List<EventViewModel>? events = new();
-    HttpClient codeClient { get; set; }
+    public EventViewModel? Event;
+    public List<string> ImgPaths;
+    // HttpClient codeClient { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         allEvents = await GetAllEvents();
         events = allEvents;
+        DeserializeImgs();
     }
 
 
@@ -57,7 +67,7 @@
 
     public async Task<List<EventViewModel>> GetAllEvents()
     {
-        var response = await codeClient.GetAsync("api/Events");
+        var response = await injectedClient.GetAsync("api/Events");
         var statusCode = response.StatusCode;
         if (statusCode == System.Net.HttpStatusCode.OK)
         {
@@ -66,6 +76,13 @@
             return eventVM;
         }
         return null;
+    }
+    public void DeserializeImgs()
+    {
+        if (Event != null)
+        {
+            ImgPaths = JsonConvert.DeserializeObject<List<string>>(Event.ImageSrcs);
+        }
     }
 }
 
