@@ -1,0 +1,206 @@
+﻿@page "/Homepage"
+@using Newtonsoft.Json;
+@using System.Security.Claims;
+@using TicketHive_MadCats.Shared.Models;
+@using TicketHive_MadCats.Shared.ViewModels;
+@inject AuthenticationStateProvider authStateProvider
+@inject HttpClient injectedClient
+
+<h3>Welcome to the Homepage @userName</h3>
+
+
+
+<label class="row text-center justify-content-center">Most popular events</label>
+<div class="row text-center justify-content-center">
+    <div class="col-3 border border-2 border-dark">
+        @if (events != null)
+        {
+            var sortedEvents = events.OrderBy(e => e.MaxTickets - e.BookedTickets);
+            foreach (var ev in sortedEvents)
+            {
+                <div class="event-item">
+                    @if (ev.BookedTickets >= ev.MaxTickets)
+                    {
+                        <h3>@ev.Name</h3>
+                        <em class="color text-danger" style="font-size: 18px">  Event is fully booked!</em>
+                    }
+                    else
+                    {
+                        <h3>@ev.Name - @ev.BookedTickets/@ev.MaxTickets tickets are booked.</h3>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<div class="row text-center justify-content-center">
+    <div class="col-3">
+        <label>Search for events:</label>
+        <input type="text" class="form-control" @oninput="FilterEvent" />
+    </div>
+</div>
+
+<div class="row text-center justify-content-center">
+    @if (events != null)
+    {
+        foreach (var events in events)
+        {
+            <div class="col-3 border border-2 border-dark m-2 p-2">
+                <a href="/EventPage/@events.Id">
+                    <h3>@events.Name</h3>
+                </a>
+                @*Ändra priset till landets egna valuta*@
+                <p>@events.TicketPrice</p>
+                <p>@events.Date</p>
+                <em>@events.Location</em>
+
+                @if (events.BookedTickets >= events.MaxTickets)
+                {
+                    <br />
+                    <em class="color text-danger" style="font-size: 18px">  Event is fully booked!</em>
+                    <br />
+                }
+
+            </div>
+        }
+    }
+    else
+    {
+        <h3>Loading events... </h3>
+    }
+</div>
+
+<div class="row text-center justify-content-center">
+    @*Visar bokningar man gjort*@
+    <h3>Booked tickets:</h3>
+    @if (ShowTicketEvent != null)
+    {
+        foreach (var events in ShowTicketEvent)
+        {
+            <p>@events.Name, @events.EventType, @events.Location, @events.Date</p>
+        }
+    }
+    else
+    {
+        <h3>No booked tickets found.</h3>
+    }
+</div>
+
+<style>
+    .event-item {
+        border-bottom: 1px solid black;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+
+@code {
+
+    [Inject]
+    protected HttpClient codeClient { get; set; }
+    [Inject]
+    public AuthenticationStateProvider authenticationStateProvider { get; set; }
+    private string userName;
+
+    //Tanken är att filtrera events
+    private List<EventViewModel>? allEvents = new();
+    private List<EventViewModel>? events = new();
+    private List<TicketViewModel>? bookedTickets = new();
+    public List<EventViewModel>? ShowTicketEvent = new();
+    //[Parameter]
+    //public int Id { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        allEvents = await GetAllEvents();
+        events = allEvents;
+        var state = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+        userName = user.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+        bookedTickets = await GetBookedTickets();
+
+        foreach (var ticket in bookedTickets)
+        {
+            var eventVM = await GetOneEvent(ticket.EventModelId);
+            if (eventVM != null)
+            {
+                ShowTicketEvent.Add(eventVM);
+            }
+        }
+    }
+
+
+    public async Task<List<EventViewModel>> GetAllEvents()
+    {
+        var response = await codeClient.GetAsync("api/Events");
+        var statusCode = response.StatusCode;
+        if (statusCode == System.Net.HttpStatusCode.OK)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            List<EventViewModel?> eventVM = JsonConvert.DeserializeObject<List<EventViewModel?>>(responseBody);
+            return eventVM;
+        }
+        return null;
+    }
+
+    public async Task<List<TicketViewModel>> GetBookedTickets()
+    {
+        try
+        {
+            var response = await codeClient.GetAsync($"api/Tickets/Username{userName}");
+            var statusCode = response.StatusCode;
+            if (statusCode == System.Net.HttpStatusCode.OK)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                List<TicketViewModel>? bookedTickets = JsonConvert.DeserializeObject<List<TicketViewModel?>>(responseBody);
+                return bookedTickets;
+            }
+            return null;
+        }
+        catch (Exception ex)
+        {
+            // Log the error or display an error message to the user
+            Console.WriteLine($"Error getting booked tickets!");
+            return null;
+        }
+    }
+
+    public async Task<EventViewModel?> GetOneEvent(int eventId)
+    {
+        var response = await codeClient.GetAsync($"api/Events/{eventId}");
+        var statusCode = response.StatusCode;
+        if (statusCode == System.Net.HttpStatusCode.OK)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            EventViewModel? eventVM = JsonConvert.DeserializeObject<EventViewModel?>(responseBody);
+            return eventVM;
+        }
+        return null;
+    }
+
+    private void FilterEvent(ChangeEventArgs e)
+    {
+        events = allEvents!.Where(p =>
+            p.Name!.ToLower().Contains(e.Value!.ToString()!.ToLower()) ||
+            p.Location.ToLower().Contains(e.Value!.ToString()!.ToLower()) ||
+            p.EventType.ToLower().Contains(e.Value!.ToString()!.ToLower())
+            ).ToList();
+    }
+
+    //public async Task<List<EventViewModel?>> GetOneEvent()
+    //{
+    //    var response = await codeClient.GetAsync($"api/Events/{Id}");
+    //    var statusCode = response.StatusCode;
+    //    if (statusCode == System.Net.HttpStatusCode.OK)
+    //    {
+    //        var responseBody = await response.Content.ReadAsStringAsync();
+    //        List<EventViewModel?> eventVM = JsonConvert.DeserializeObject<List<EventViewModel?>>(responseBody);
+    //        return eventVM;
+    //    }
+    //    return null;
+
+    //}
+}
