@@ -28,10 +28,11 @@
         <br />
         @foreach (var ImgPath in ImgPaths)
         {
-            <img src=@ImgPath>
+            <img src=@ImgPath width="250" height="250" style="margin-right: 10px;">
+            
         }
         <br />
-        <button @onclick="() => navMan.NavigateTo(CartUrl)">Go to cart</button>
+        <button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart</button>
     }
 }
 else
@@ -40,7 +41,7 @@ else
 }
 
 <div>
-    <button @onclick="() => navMan.NavigateTo(IndexUrl)">Go to HomePage</button>
+    <button @onclick="() => navMan.NavigateTo(IndexUrl)" style="margin: 10px;">Go to HomePage</button> 
 </div>
 
 @code {
