@@ -20,6 +20,9 @@
     {
         foreach (var events in events)
         {
+            // Deser events.imagesrcs till list<string>
+            List<string>? listOfPaths = DeserializeImageSrcs(events.ImageSrcs);
+
             <div class="col-3 border border-2 border-dark m-2 p-2">
                             <a href="/EventPage/@events.Id">
                             <h3>@events.Name</h3>
@@ -28,7 +31,11 @@
                             <p>@events.TicketPrice kr </p>
                             <p>@events.Date</p>
                             <em>@events.Location</em>
-                            
+                @foreach(string path in listOfPaths)
+                {
+                    <img src=@path/>
+                }
+
                 @if(events.BookedTickets >= events.MaxTickets)
                 {
                     <br />
@@ -56,7 +63,7 @@
     {
         allEvents = await GetAllEvents();
         events = allEvents;
-        DeserializeImgs();
+        //DeserializeImgs();
     }
 
     private void FilterByLowestPrice()
@@ -97,12 +104,17 @@
         }
         return null;
     }
-    public void DeserializeImgs()
+    //public void DeserializeImgs()
+    //{
+    //    if (Event != null)
+    //    {
+    //        ImgPaths = JsonConvert.DeserializeObject<List<string>>(Event.ImageSrcs);
+    //    }
+    //}
+
+    public List<string>? DeserializeImageSrcs(string imageSrcsString)
     {
-        if (Event != null)
-        {
-            ImgPaths = JsonConvert.DeserializeObject<List<string>>(Event.ImageSrcs);
-        }
+        return JsonConvert.DeserializeObject<List<string>>(imageSrcsString);
     }
 }
 
