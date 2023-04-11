@@ -9,7 +9,8 @@
 <div>
     <label>Search for events:</label>
     <input type="text" @oninput="FilterEvent" />
-    <button @onclick="FilterByPrice">Filter by price</button>
+    <button @onclick="FilterByHighestPrice">Filter by highest price</button>
+    <button @onclick="FilterByLowestPrice">Filter by lowest price</button>
 </div>
 
 
@@ -58,11 +59,17 @@
         DeserializeImgs();
     }
 
-    private void FilterByPrice()
+    private void FilterByLowestPrice()
     {
-        events = allEvents!.Where(p =>
-            p.TicketPrice <= 50 // modify the condition to filter by desired price range
-        ).ToList();
+        events = allEvents!.Where(p => p.TicketPrice > 1)
+                           .OrderBy(p => p.TicketPrice)
+                           .ToList();
+    }
+    private void FilterByHighestPrice()
+    {
+        events = allEvents!.Where(p => p.TicketPrice >1)
+                           .OrderByDescending(p => p.TicketPrice)
+                           .ToList();
     }
 
 
