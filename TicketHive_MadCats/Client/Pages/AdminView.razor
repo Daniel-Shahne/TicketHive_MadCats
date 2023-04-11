@@ -10,6 +10,8 @@
 @inject HttpClient client
 @inject NavigationManager navMan
 @inject AuthenticationStateProvider authStateProvider
+@inject IJSRuntime JSRuntime
+
 
 <h3>AdminView</h3>
 
@@ -51,10 +53,10 @@
         <label>Event Date</label>
         <InputDate @bind-Value="eventModel.Date" class="form-control" />
     </div>
-    <div>
+@*    <div>
         <label>Event Images</label>
         <InputText @bind-Value="eventModel.ImageSrcs" class="form-control" />
-    </div>
+    </div>*@
     <div>
         <label>Max Capacity of Event</label>
         <InputNumber @bind-Value="eventModel.MaxTickets" class="form-control" />
@@ -144,7 +146,11 @@
 
     private async Task CreateEvent()
     {
-        string modelToCreate = JsonConvert.SerializeObject(eventModel);
+        List<string> imageSrcsList = new() {"none", "none"};
+
+        eventModel.ImageSrcs = JsonConvert.SerializeObject(imageSrcsList);
+
+        var modelToCreate = JsonConvert.SerializeObject(eventModel);
 
         var response = await httpClient.PostAsJsonAsync("api/events", modelToCreate);
 
@@ -170,19 +176,23 @@
 
     private async Task DeleteEvent(int id)
     {
-        var response = await httpClient.DeleteAsync($"/api/events/{id}");
+        if (await JSRuntime.InvokeAsync<bool>("myFunctions.confirmDelete", id))
+        {
+            var response = await httpClient.DeleteAsync($"/api/events/{id}");
 
-        if (response.IsSuccessStatusCode)
-        {
-            await EventsInList();
-            deleteStatusMessage = "Deletion is a success.";
-        }
-        else
-        {
-            deleteStatusMessage = "Deletion was not a success.";
-            return;
+            if (response.IsSuccessStatusCode)
+            {
+                await EventsInList();
+                deleteStatusMessage = "Deletion is a success.";
+            }
+            else
+            {
+                deleteStatusMessage = "Deletion was not a success.";
+                return;
+            }
         }
     }
+
 
 
 
