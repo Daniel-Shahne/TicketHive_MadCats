@@ -32,23 +32,23 @@ namespace TicketHive_MadCats.Server.Data
             // TE1LS = Test Eventmodel 1 list of strings
             List<string> TE1LS = new()
             {
-                "/images/event images/image 1.avif",
-                "/images/event images/image 2.avif"
+                "/images/event images/image-1.png",
+                "/images/event images/image-2.png"
             };
             List<string> TE2LS = new()
             {
-                "/images/event images/image 3.avif",
-                "/images/event images/image 4.avif"
+                "/images/event images/image-3.png",
+                "/images/event images/image-4.png"
             };
             List<string> TE3LS = new()
             {
-                "/images/event images/image 5.avif",
-                "/images/event images/image 6.avif"
+                "/images/event images/image-5.png",
+                "/images/event images/image-6.png"
             };
             List<string> TE4LS = new()
             {
-                "/images/event images/image 7.avif",
-                "/images/event images/image 8.avif"
+                "/images/event images/image-7.png",
+                "/images/event images/image-8.png"
             };
             // TE1S = Test eventmodel 1 string
             string TE1S = JsonConvert.SerializeObject(TE1LS);

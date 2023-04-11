@@ -12,7 +12,7 @@ using TicketHive_MadCats.Server.Data;
 namespace TicketHive_MadCats.Server.MigrationsEventTicket
 {
     [DbContext(typeof(EventTicketDbContext))]
-    [Migration("20230410100839_Initial")]
+    [Migration("20230411092647_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -66,9 +66,9 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                         new
                         {
                             Id = 1,
-                            Date = new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(5946),
+                            Date = new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(628),
                             EventType = "Concert",
-                            ImageSrcs = "[\"/images/event images/image 1.avif\",\"/images/event images/image 2.avif\"]",
+                            ImageSrcs = "[\"/images/event images/image-1.png\",\"/images/event images/image-2.png\"]",
                             Location = "Malmö, Sweden",
                             MaxTickets = 5,
                             Name = "Rock Concert",
@@ -77,9 +77,9 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                         new
                         {
                             Id = 2,
-                            Date = new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(6026),
+                            Date = new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(680),
                             EventType = "Concert",
-                            ImageSrcs = "[\"/images/event images/image 3.avif\",\"/images/event images/image 4.avif\"]",
+                            ImageSrcs = "[\"/images/event images/image-3.png\",\"/images/event images/image-4.png\"]",
                             Location = "Stockholm, Sweden",
                             MaxTickets = 2,
                             Name = "Latino Concert",
@@ -88,9 +88,9 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                         new
                         {
                             Id = 3,
-                            Date = new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(6032),
+                            Date = new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(682),
                             EventType = "Tournament",
-                            ImageSrcs = "[\"/images/event images/image 5.avif\",\"/images/event images/image 6.avif\"]",
+                            ImageSrcs = "[\"/images/event images/image-5.png\",\"/images/event images/image-6.png\"]",
                             Location = "Krakow, Poland",
                             MaxTickets = 100,
                             Name = "Dreamhack",
@@ -99,9 +99,9 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                         new
                         {
                             Id = 4,
-                            Date = new DateTime(2023, 4, 10, 12, 8, 39, 294, DateTimeKind.Local).AddTicks(6037),
+                            Date = new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(684),
                             EventType = "Exhibition",
-                            ImageSrcs = "[\"/images/event images/image 7.avif\",\"/images/event images/image 8.avif\"]",
+                            ImageSrcs = "[\"/images/event images/image-7.png\",\"/images/event images/image-8.png\"]",
                             Location = "Berlin, Germany",
                             MaxTickets = 20,
                             Name = "Art Exhibition",
