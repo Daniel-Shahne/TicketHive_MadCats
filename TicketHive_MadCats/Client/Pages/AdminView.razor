@@ -53,10 +53,10 @@
         <label>Event Date</label>
         <InputDate @bind-Value="eventModel.Date" class="form-control" />
     </div>
-    <div>
+@*    <div>
         <label>Event Images</label>
         <InputText @bind-Value="eventModel.ImageSrcs" class="form-control" />
-    </div>
+    </div>*@
     <div>
         <label>Max Capacity of Event</label>
         <InputNumber @bind-Value="eventModel.MaxTickets" class="form-control" />
@@ -146,7 +146,11 @@
 
     private async Task CreateEvent()
     {
-        string modelToCreate = JsonConvert.SerializeObject(eventModel);
+        List<string> imageSrcsList = new() {"none", "none"};
+
+        eventModel.ImageSrcs = JsonConvert.SerializeObject(imageSrcsList);
+
+        var modelToCreate = JsonConvert.SerializeObject(eventModel);
 
         var response = await httpClient.PostAsJsonAsync("api/events", modelToCreate);
 
