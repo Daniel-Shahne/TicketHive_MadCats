@@ -31,9 +31,10 @@
                             <p>@events.TicketPrice kr </p>
                             <p>@events.Date</p>
                             <em>@events.Location</em>
+                            <br>
                 @foreach(string path in listOfPaths)
                 {
-                    <img src=@path/>
+                    <img src=@path width="150" height="150" style="margin: 5px"/>
                 }
 
                 @if(events.BookedTickets >= events.MaxTickets)
