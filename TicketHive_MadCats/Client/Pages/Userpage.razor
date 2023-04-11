@@ -1,0 +1,81 @@
+﻿@page "/Userpage"
+@using Newtonsoft.Json;
+@using System.Security.Claims;
+@using TicketHive_MadCats.Shared.Models;
+@using TicketHive_MadCats.Shared.ViewModels;
+@inject AuthenticationStateProvider authStateProvider
+@inject HttpClient injectedClient
+@inject IJSRuntime jsRuntime
+
+<h3>Userpage for @userName</h3>
+
+<form>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password"><br><br>
+    <label for="country">Country:</label>
+    <input type="text" id="country" name="country"><br><br>
+    <button type="submit" onclick="@SaveChangesAsync">Save changes</button>
+</form>
+
+
+
+
+@code {
+    [Inject]
+    public AuthenticationStateProvider authenticationStateProvider { get; set; }
+    private string userName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //var state = await authenticationStateProvider.GetAuthenticationStateAsync();
+        //var user = state.User;
+        ////userName = user.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+        //userName = user.Identity.Name;
+
+        var state = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+        //userName = user.Identity?.Name ?? user.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            userName = user.Identity.Name;
+        }
+    }
+
+    //ChatGPTs förslag på hur allt ska sparas.
+    private async Task SaveChangesAsync()
+    {
+        // Get the new password and country values from the input fields
+        var password = await jsRuntime.InvokeAsync<ElementReference>("eval", "document.getElementById('password').value");
+        var country = await jsRuntime.InvokeAsync<ElementReference>("eval", "document.getElementById('country').value");
+
+        // Call an API method to save the changes
+        //Finns ingen api för users. Inte heller någon viewmodel. Vet inte riktigt hur jag ska få igenom att det ska sparas.
+        //await injectedClient.PostAsJsonAsync("api/users/update", new UserUpdateViewModel
+        //{
+        //    Password = password,
+        //    Country = country
+        //});
+
+        // Display a success message to the user
+        await jsRuntime.InvokeVoidAsync("alert", "Changes saved successfully!");
+    }
+
+    //private async Task SaveChangesAsync()
+    //{
+    //    var passwordElement = await jsRuntime.InvokeAsync<ElementReference>("document.getElementById", "password");
+    //    var passwordValue = await jsRuntime.InvokeAsync<string>("eval", $"document.getElementById('{passwordElement.Id}').value");
+
+    //    var countryElement = await jsRuntime.InvokeAsync<ElementReference>("document.getElementById", "country");
+    //    var countryValue = await jsRuntime.InvokeAsync<string>("eval", $"document.getElementById('{countryElement.Id}').value");
+
+        
+    //}
+
+    //private async Task SaveChangesAsync()
+    //{
+    //    var password = await jsRuntime.InvokeAsync<ElementReference>("document.getElementById", "password");
+    //    var country = await jsRuntime.InvokeAsync<ElementReference>("document.getElementById", "country");
+
+    //}
+
+}
