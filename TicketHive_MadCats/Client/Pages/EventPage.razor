@@ -10,7 +10,7 @@
 
     @if(Event.BookedTickets >= Event.MaxTickets)
     {
-        <h2 class="color text-danger">  Event is fully booked!</h2>
+        <em class="color text-danger">  Event is fully booked!</em>
     }
     else
     {
@@ -18,7 +18,7 @@
         <br />
         <h2>Event type: @Event.EventType</h2>
         <br />
-        <h2>Event Price: @Event.TicketPrice</h2>
+        <h2>Event Price: @Event.TicketPrice kr</h2>
         <br />
         <h2>Location: @Event.Location</h2>
         <br />
@@ -26,12 +26,12 @@
         <br />
         <h2>Tickets available: @Event.MaxTickets</h2>
         <br />
-        <button @onclick="() => navMan.NavigateTo(CartUrl)">Add to Cart</button>
-    }
-
-    @foreach(var ImgPath in ImgPaths)
-    {
-        <img src=@ImgPath >
+        @foreach (var ImgPath in ImgPaths)
+        {
+            <img src=@ImgPath>
+        }
+        <br />
+        <button @onclick="() => navMan.NavigateTo(CartUrl)">Go to cart</button>
     }
 }
 else
@@ -48,7 +48,6 @@ else
     public int Id { get; set; }
     [Inject]
     HttpClient codeClient { get; set; }
-
     public EventViewModel? Event;
     public List<string> ImgPaths;
     public string IndexUrl { get; set; } = "/";
@@ -59,11 +58,6 @@ else
         Event = await GetOneEvent();
         DeserializeImgs();
 
-    }
-
-    public void AddToCart(int Id)
-    {
-        
     }
 
     public void DeserializeImgs()
