@@ -1,10 +1,13 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
 @using System.Text.Json
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inherits LayoutComponentBase
+
+@inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navMan
 
 
@@ -25,6 +28,13 @@
     <button @onclick="() => navMan.NavigateTo(AdminViewUrl)">Go to admin view</button>
 </AuthorizeView>
 
+@if(authenticationStateProvider.GetAuthenticationStateAsync().Result.User.Identity.IsAuthenticated)
+{
+    <button @onclick="@(() => navMan.NavigateTo("/userpage"))">Go to User Page</button>
+}
+
+
+
 <style>
     .btn-login, .btn-register {
         display: inline-block;
@@ -44,4 +54,5 @@
 
 @code{
     public string AdminViewUrl { get; set; } = "/AdminView";
+
 }

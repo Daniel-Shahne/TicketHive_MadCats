@@ -3,27 +3,58 @@
 @using System.Security.Claims;
 @using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.ViewModels;
+@using TicketHive_MadCats.Shared.Statics
 @inject AuthenticationStateProvider authStateProvider
-@inject HttpClient injectedClient
+@inject HttpClient client
 @inject IJSRuntime jsRuntime
 
 <h3>Userpage for @userName</h3>
 
-<form>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password"><br><br>
-    <label for="country">Country:</label>
-    <input type="text" id="country" name="country"><br><br>
-    <button type="submit" onclick="@SaveChangesAsync">Save changes</button>
-</form>
+<EditForm Model="@updateUserModel" OnValidSubmit="@UpdateUser">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
+    <label>New Password:</label>
+    <InputText type="password" @bind-Value="updateUserModel.NewPassword" />
 
+    <label>New Country:</label>
+    <InputText @bind-Value="updateUserModel.NewCountry" list="countryList" />
+    <datalist id="countryList">
+        @foreach (var kvp in countryAbbreviations)
+        {
+            <option value="@kvp.Key">@kvp.Value</option>
+        }
+    </datalist>
+
+    <button type="submit">Update</button>
+</EditForm>
+
+<h3>@statusMessage</h3>
 
 
 @code {
     [Inject]
     public AuthenticationStateProvider authenticationStateProvider { get; set; }
+
+    [Inject]
+    public HttpClient httpClient { get; set; }
+
     private string userName;
+    private Dictionary<string, string> countryAbbreviations = CountriesAndCodes.getCountriesAndAbbreviations;
+    private string statusMessage = "";
+    private UpdateUserModel updateUserModel = new();
+
+    private async Task UpdateUser()
+    {
+        string userToUpdate = JsonConvert.SerializeObject(updateUserModel);
+
+        var response = await httpClient.PutAsJsonAsync("api/users", userToUpdate);
+        if (response.IsSuccessStatusCode)
+        {
+            statusMessage = "Nice job, you're from another country and your password's been changed. Or maybe not, if you didn't pick a new country or a new password, then nothing changed, right?";
+        }
+    }
+
 
     protected override async Task OnInitializedAsync()
     {
