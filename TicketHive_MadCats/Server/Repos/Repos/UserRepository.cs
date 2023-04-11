@@ -11,9 +11,11 @@ namespace TicketHive_MadCats.Server.Repos.Repos
     public class UserRepository
     {
         private readonly ApplicationDbContext _context;
-        public UserRepository(ApplicationDbContext context)
+        private readonly IPasswordHasher<IdentityUser> passwordHasher;
+        public UserRepository(ApplicationDbContext context, IPasswordHasher<IdentityUser> passwordHasher)
         {
             _context = context;
+            this.passwordHasher = passwordHasher;
 
         }
 

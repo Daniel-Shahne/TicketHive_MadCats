@@ -3,14 +3,14 @@
 @using System.Security.Claims;
 @using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.ViewModels;
-@using TicketHive_MadCats.Shared.Statics
+@using TicketHive_MadCats.Shared.Statics;
 @inject AuthenticationStateProvider authStateProvider
 @inject HttpClient client
 @inject IJSRuntime jsRuntime
 
 <h3>Userpage for @userName</h3>
 
-<EditForm Model="@updateUserModel" OnValidSubmit="@UpdateUser">
+<EditForm Model="@updateUserModel" OnValidSubmit="@(() => UpdateUser(currentUser.Id))">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -35,20 +35,22 @@
 @code {
     [Inject]
     public AuthenticationStateProvider authenticationStateProvider { get; set; }
-
     [Inject]
     public HttpClient httpClient { get; set; }
 
     private string userName;
+
     private Dictionary<string, string> countryAbbreviations = CountriesAndCodes.getCountriesAndAbbreviations;
     private string statusMessage = "";
     private UpdateUserModel updateUserModel = new();
 
-    private async Task UpdateUser()
+    private async Task UpdateUser(int userId)
     {
+        updateUserModel.Id = userId;
+
         string userToUpdate = JsonConvert.SerializeObject(updateUserModel);
 
-        var response = await httpClient.PutAsJsonAsync("api/users", userToUpdate);
+        var response = await httpClient.PutAsJsonAsync("/api/users" + userId, userToUpdate);
         if (response.IsSuccessStatusCode)
         {
             statusMessage = "Nice job, you're from another country and your password's been changed. Or maybe not, if you didn't pick a new country or a new password, then nothing changed, right?";

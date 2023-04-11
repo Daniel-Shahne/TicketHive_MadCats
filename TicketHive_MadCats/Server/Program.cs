@@ -20,6 +20,7 @@ builder.Services.AddDefaultIdentity<CustomUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+
 builder.Services.AddIdentityServer()
     .AddApiAuthorization<CustomUser, ApplicationDbContext>(options =>
     {

@@ -19,19 +19,19 @@ namespace TicketHive_MadCats.Server.Controllers
         private readonly IPasswordHasher<IdentityUser> passwordHasher;
         private readonly ApplicationDbContext _context;
         private readonly UserRepository userRepository;
-        public UsersController(Microsoft.AspNetCore.Identity.UserManager<IdentityUser> userManager, ApplicationDbContext _context, UserRepository userRepository)
+        public UsersController(Microsoft.AspNetCore.Identity.UserManager<IdentityUser> userManager, ApplicationDbContext _context, IPasswordHasher<IdentityUser> passwordHasher)
         {
             this.userManager = userManager;
             this._context = _context;
-            this.userRepository = userRepository;
+            this.passwordHasher = passwordHasher;
 
         }
 
 
-        [HttpPut("api/users")]
-        public async Task<IActionResult> UpdateUser(UpdateUserModel updateUserModel)
+        [HttpPut("/api/users")]
+        public async Task<ActionResult> UpdateUser(string userId, UpdateUserModel updateUserModel)
         {
-            var currentUser = await userManager.GetUserAsync(User);
+            var currentUser = await userManager.FindByIdAsync(userId);
 
             if (currentUser == null)
             {

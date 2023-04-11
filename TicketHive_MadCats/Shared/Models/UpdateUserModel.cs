@@ -10,7 +10,7 @@ namespace TicketHive_MadCats.Shared.Models
 {
     public class UpdateUserModel
     {
-        
+        [Key]
         public int Id { get; set; }
         
         [JsonProperty("NewPassword")]
