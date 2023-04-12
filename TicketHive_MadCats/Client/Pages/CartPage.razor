@@ -16,7 +16,7 @@
 		@foreach (var kvp in cart)
 		{
 			<div>
-				<span>Event @kvp.Key | @kvp.Value in cart | @totalPrice() </span>
+				<span>Event @kvp.Key | @kvp.Value in cart | @totalPrice(Event, kvp.Value) </span>
 				<br>
 				<div>
 					<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
@@ -104,11 +104,13 @@ else if (cart == null)
 		return null;
 	}
 
-
-	public int totalPrice()
+	public int totalPrice(EventViewModel? Event, int quantity)
 	{
-		int totalPrice = Event.TicketPrice;
+		if (Event == null)
+			return 0;
 
+		int totalPrice = Event.TicketPrice * quantity;
 		return totalPrice;
 	}
+
 }
