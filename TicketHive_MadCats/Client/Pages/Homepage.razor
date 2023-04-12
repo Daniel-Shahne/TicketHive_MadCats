@@ -129,15 +129,22 @@
         var user = state.User;
         userName = user.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
         bookedTickets = await GetBookedTickets();
-
-        foreach (var ticket in bookedTickets)
+        if(bookedTickets != null)
         {
-            var eventVM = await GetOneEvent(ticket.EventModelId);
-            if (eventVM != null)
+            foreach (var ticket in bookedTickets)
             {
-                ShowTicketEvent.Add(eventVM);
+                var eventVM = await GetOneEvent(ticket.EventModelId);
+                if (eventVM != null)
+                {
+                    ShowTicketEvent.Add(eventVM);
+                }
             }
         }
+        else
+        {
+            // no tickets = no shown tickets
+        }
+        
     }
 
 
