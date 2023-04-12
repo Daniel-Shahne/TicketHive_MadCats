@@ -17,6 +17,7 @@
                 var sortedEvents = events.OrderBy(e => e.MaxTickets - e.BookedTickets);
                 foreach (var ev in sortedEvents)
                 {
+                    <a href="/EventPage/@ev.Id">
                     <div class="event-item">
                         @if (ev.BookedTickets >= ev.MaxTickets)
                         {
@@ -28,6 +29,7 @@
                             <h3>@ev.Name - @ev.BookedTickets/@ev.MaxTickets tickets are booked.</h3>
                         }
                     </div>
+                    </a>
                 }
             }
         </div>
