@@ -18,17 +18,19 @@
             var sortedEvents = events.OrderBy(e => e.MaxTickets - e.BookedTickets);
             foreach (var ev in sortedEvents)
             {
-                <div class="event-item">
-                    @if (ev.BookedTickets >= ev.MaxTickets)
-                    {
-                        <h3>@ev.Name</h3>
-                        <em class="color text-danger" style="font-size: 18px">  Event is fully booked!</em>
-                    }
-                    else
-                    {
-                        <h3>@ev.Name - @ev.BookedTickets/@ev.MaxTickets tickets are booked.</h3>
-                    }
-                </div>
+                <a href="/EventPage/@ev.Id">
+                    <div class="event-item">
+                        @if (ev.BookedTickets >= ev.MaxTickets)
+                        {
+                            <h3>@ev.Name</h3>
+                            <em class="color text-danger" style="font-size: 18px">  Event is fully booked!</em>
+                        }
+                        else
+                        {
+                            <h3>@ev.Name - @ev.BookedTickets/@ev.MaxTickets tickets are booked.</h3>
+                        }
+                    </div>
+                    </a>
             }
         }
     </div>
