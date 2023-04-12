@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Authorization;
+@using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.Statics;
 
 @page "/Userpage"
@@ -8,20 +9,28 @@
 @inject HttpClient injHttpClient
 @inject NavigationManager injNavMan
 
-@if (userName != null)
+@if (true)
 {
-    <h3>Welcome to your page @userName</h3> 
-    <label>New password</label>
-    <input @bind="newPassword" type="password"/>
+    <EditForm Model="@updateModel" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+@*        <ValidationSummary />
+*@
+        <div class="form-group">
+            <label for="password">New Password:</label>
+            <InputText id="password" class="form-control" @bind-Value="@updateModel.Password" />
+            <ValidationMessage For="@(() => updateModel.Password)" />
 
-    <select @bind="newCountry">
-        @foreach (string country in countries)
-        {
-            <option value="@country">@country</option>
-        }
-    </select>
+            <InputSelect id="select" class="form-control" @bind-Value="@updateModel.Country">
+                @foreach(string country in countries)
+                {
+                    <option value="@country">@country</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => updateModel.Country)" />
+        </div>
 
-    <button>Submit changes</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </EditForm>
 }
 else
 {
@@ -37,8 +46,10 @@ else
     [Inject]
     NavigationManager navMan { get; set; } = null!;
 
+    // Model to be sent on valid form
+    UpdateUserModel updateModel = new();
+
     // Variables for static use
-    public string? userName;
     public List<string> countries = CountriesAndCodes.getListOfCountries;
 
     // Variables for dynamic use
@@ -57,6 +68,11 @@ else
         }
 
         // No idea why warning isnt suppressed
-        userName = user.Identity.Name;
+        updateModel.Username = user.Identity.Name;
+    }
+
+    public void HandleValidSubmit()
+    {
+        
     }
 }
