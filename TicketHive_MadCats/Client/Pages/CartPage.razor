@@ -1,15 +1,26 @@
 ﻿@page "/CartPage"
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Authorization;
 @using TicketHive_MadCats.Client.Cookies
 @inject IJSRuntime JsRuntime
 
 <h3>CartPage</h3>
 
-@if(cart != null)
+@if(cart != null && cart.Count > 0)
 {
 	@foreach(var kvp in cart)
 	{
-		<spam>Event @kvp.Key | @kvp.Value in cart </spam>
+		<span>Event @kvp.Key | @kvp.Value in cart </span>
 	}
+}
+else if (cart != null && cart.Count == 0)
+{
+	<span>Your cart is empty</span>
+}
+else if (cart == null)
+{
+	<span>Loading cart...</span>
 }
 
 
@@ -18,12 +29,12 @@
 	[Inject]
 	public IJSRuntime jS { get; set; }
 	public CookieInterpreter? cookieInt;
-	public Dictionary<string, int>? cart;
+	public Dictionary<string, int>? cart = null;
 
 	protected override async Task OnParametersSetAsync()
 	{
 		cookieInt = new(jS);
-		StartReadingCookie();
+		await StartReadingCookie();
 	}
 
 
