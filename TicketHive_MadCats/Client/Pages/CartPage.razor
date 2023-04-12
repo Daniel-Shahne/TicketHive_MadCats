@@ -55,7 +55,7 @@ else if (cart == null)
 
 	public EventViewModel? Event;
 
-
+	// Nytt som jag lade till för att lyckas få över hela objektet från EventPage
 	private EventViewModel selectedEvent;
 	private int bookedTickets;
 
@@ -68,7 +68,7 @@ else if (cart == null)
 		await StartReadingCookie();
 	}
 
-
+	// Tar emot hela objektet ifrån EventPage, vi kan nog lägga in cookieInt = new(Js) och await StartReadingCookie(); här för dynamiska grejer, tror jag.
 	protected override void OnInitialized()
 	{
 		var query = navMan.ToAbsoluteUri(navMan.Uri).Query;
@@ -124,16 +124,16 @@ else if (cart == null)
 		return null;
 	}
 
-	public int totalPrice(string eventName, int quantity)
-	{
-		if (Event == null) return 0;
 
+	// Metod som ej används atm.
+	//public int totalPrice(string eventName, int quantity)
+	//{
+	//	if (Event == null) return 0;
 
-
-		int eventPrice = Event.TicketPrice * quantity;
-		int totalPrice = cart.Sum(kvp => kvp.Key == eventName ? eventPrice : kvp.Value * Event.TicketPrice);
-		return totalPrice;
-	}
+	//	int eventPrice = Event.TicketPrice * quantity;
+	//	int totalPrice = cart.Sum(kvp => kvp.Key == eventName ? eventPrice : kvp.Value * Event.TicketPrice);
+	//	return totalPrice;
+	//}
 
 
 
