@@ -27,7 +27,7 @@
             <br />
             <h2>Date: @Event.Date</h2>
             <br />
-            <h2>Tickets available: @totalEvents;</h2>
+            <h2>Tickets available: @totalEvents();</h2>
             <br />
             @foreach (var ImgPath in ImgPaths)
             {
@@ -45,9 +45,14 @@
                 @if ((myNumber <= Event.MaxTickets - Event.BookedTickets) && myNumber >0)
                 {
                     <button @onclick="HandleSubmit">book @myNumber</button>
+
+                }
+                @if (formSubmitted)
+                {
+                    <span style="color:green">Ticket(s) are booked!</span>
                 }
             </div>
-            @*<button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart</button>*@
+            <button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart page!</button>
         }
     }
     else
@@ -83,10 +88,11 @@
     public EventViewModel? Event;
     public List<string> ImgPaths;
     public string IndexUrl { get; set; } = "/";
-    public string CartUrl { get; set; } = "/Cart";
+    public string CartUrl { get; set; } = "/Cartpage";
 
     private int myNumber;
     private bool showWarning = false;
+    private bool formSubmitted;
 
 
 
@@ -127,11 +133,14 @@
 
     private async Task HandleSubmit()
     {
+        formSubmitted = true;
         await cookieInterpreter.UpdateCookieForSingleEvent(Event.Name, myNumber);
     }
 
-    public void totalEvents()
+    public int totalEvents()
     {
-        int TotalEvent = Event.BookedTickets - Event.MaxTickets;
+        int TotalEvent = Event.MaxTickets - Event.BookedTickets;
+
+        return TotalEvent;
     }
 }
