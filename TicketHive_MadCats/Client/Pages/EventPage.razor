@@ -27,7 +27,7 @@
             <br />
             <h2>Date: @Event.Date</h2>
             <br />
-            <h2>Tickets available: @Event.MaxTickets</h2>
+            <h2>Tickets available: @totalEvents;</h2>
             <br />
             @foreach (var ImgPath in ImgPaths)
             {
@@ -130,5 +130,8 @@
         await cookieInterpreter.UpdateCookieForSingleEvent(Event.Name, myNumber);
     }
 
-
+    public void totalEvents()
+    {
+        int TotalEvent = Event.BookedTickets - Event.MaxTickets;
+    }
 }
