@@ -1,10 +1,12 @@
 ﻿@page "/EventPage/{Id:int}"
+@using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Client.Cookies;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject HttpClient client
 @inject NavigationManager navMan
 @inject IJSRuntime JSRuntime
+@attribute [Authorize]
 
 <body>
     @if (Event != null)

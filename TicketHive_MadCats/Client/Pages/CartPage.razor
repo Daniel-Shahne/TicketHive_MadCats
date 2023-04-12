@@ -2,20 +2,33 @@
 @attribute [Authorize]
 
 @using Microsoft.AspNetCore.Authorization;
+@using Newtonsoft.Json;
 @using TicketHive_MadCats.Client.Cookies
+@using TicketHive_MadCats.Shared.ViewModels;
 @inject IJSRuntime JsRuntime
 
 <h3>CartPage</h3>
 
 @if(cart != null && cart.Count > 0)
 {
-	@foreach(var kvp in cart)
-	{
-		<span>Event @kvp.Key | @kvp.Value in cart </span>
-	}
+	<div class="row text-center justify-content-center border-2 border-dark">
+
+		@foreach (var kvp in cart)
+		{
+			<div>
+				<span>Event @kvp.Key | @kvp.Value in cart | @totalPrice() </span>
+				<br>
+				<div>
+					<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
+					<button @onclick="@(async () => await AddToCart(kvp.Key))">Add</button>
+				</div>
+			</div>
+		}
+
+	</div>
 
 	// ENDA RADEN SOM BEHÖVS FÖR ATT ÄNDRA VARUKORG
-	@*cart = await cookieInt.UpdateCookieForSingleEvent(eventName, event1quantity)*@
+	@*cart = await cookieInt.UpdateCookieForSingleEvent(eventName, quantity)*@
 }
 else if (cart != null && cart.Count == 0)
 {
@@ -29,14 +42,24 @@ else if (cart == null)
 
 
 @code {
+	[Parameter]
+	public int Id { get; set; }
 	[Inject]
 	public IJSRuntime jS { get; set; }
+	[Inject]
+	HttpClient codeClient { get; set; }
+
 	public CookieInterpreter? cookieInt;
 	public Dictionary<string, int>? cart = null;
+
+	public EventViewModel? Event;
+
+
 
 	protected override async Task OnParametersSetAsync()
 	{
 		cookieInt = new(jS);
+		Event = await GetOneEvent();
 		await StartReadingCookie();
 	}
 
@@ -51,10 +74,41 @@ else if (cart == null)
 		}
 		else
 		{
-			await cookieInt.CreateCookie();
+
 			cart = new();
 		}
 	}
 
+	public async Task RemoveFromCart(string eventName)
+	{
+		int newQuantity = cart[eventName] - 1;
+		cart = await cookieInt.UpdateCookieForSingleEvent(eventName, -1);
+	}
 
+	public async Task AddToCart(string eventName)
+	{
+		int newQuantity = cart[eventName] + 1;
+		cart = await cookieInt.UpdateCookieForSingleEvent(eventName, 1);
+	}
+
+	public async Task<EventViewModel?> GetOneEvent()
+	{
+		var response = await codeClient.GetAsync($"api/Events/{Id}");
+		var statusCode = response.StatusCode;
+		if (statusCode == System.Net.HttpStatusCode.OK)
+		{
+			var responseBody = await response.Content.ReadAsStringAsync();
+			EventViewModel? eventVM = JsonConvert.DeserializeObject<EventViewModel?>(responseBody);
+			return eventVM;
+		}
+		return null;
+	}
+
+
+	public int totalPrice()
+	{
+		int totalPrice = Event.TicketPrice;
+
+		return totalPrice;
+	}
 }

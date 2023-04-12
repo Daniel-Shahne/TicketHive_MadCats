@@ -47,7 +47,7 @@ namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
 
                     if (signInResult.Succeeded)
                     {
-                        return Redirect("~/");
+                        return Redirect("/HomePage");
                     }
                 }
             }

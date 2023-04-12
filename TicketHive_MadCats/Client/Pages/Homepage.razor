@@ -1,10 +1,13 @@
 ﻿@page "/Homepage"
+@using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
 @using System.Security.Claims;
 @using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject AuthenticationStateProvider authStateProvider
 @inject HttpClient injectedClient
+@inject NavigationManager navMan
+@attribute [Authorize]
 
 <h3>Welcome to the Homepage @userName</h3>
 
@@ -90,6 +93,8 @@
 </body>
 
 
+<button @onclick="() => navMan.NavigateTo(BookingUrl)" style="margin: 10px;">Go to BookingPage</button>
+
 <style>
     .event-item {
         border-bottom: 1px solid black;
@@ -116,6 +121,7 @@
     private List<EventViewModel>? events = new();
     private List<TicketViewModel>? bookedTickets = new();
     public List<EventViewModel>? ShowTicketEvent = new();
+    public string BookingUrl { get; set; } = "/BookingPage";
     //[Parameter]
     //public int Id { get; set; }
 
