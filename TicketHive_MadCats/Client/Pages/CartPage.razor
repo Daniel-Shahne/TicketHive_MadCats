@@ -5,6 +5,7 @@
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Client.Cookies
 @using TicketHive_MadCats.Shared.ViewModels;
+@inject NavigationManager navMan
 @inject IJSRuntime JsRuntime
 
 <h3>CartPage</h3>
@@ -16,7 +17,7 @@
 		@foreach (var kvp in cart)
 		{
 			<div>
-				<span>Event @kvp.Key | @kvp.Value in cart | @totalPrice() </span>
+				<span>Event @selectedEvent.Name | No. tickets in cart: @bookedTickets | Total price: @(selectedEvent.TicketPrice * bookedTickets)</span>
 				<br>
 				<div>
 					<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
@@ -55,6 +56,10 @@ else if (cart == null)
 	public EventViewModel? Event;
 
 
+	private EventViewModel selectedEvent;
+	private int bookedTickets;
+
+
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -63,6 +68,20 @@ else if (cart == null)
 		await StartReadingCookie();
 	}
 
+
+	protected override void OnInitialized()
+	{
+		var query = navMan.ToAbsoluteUri(navMan.Uri).Query;
+		var parameters = System.Web.HttpUtility.ParseQueryString(query);
+		var serializedEvent = parameters["event"];
+		var tickets = parameters["tickets"];
+
+		if (!string.IsNullOrEmpty(serializedEvent) && int.TryParse(tickets, out int result))
+		{
+			bookedTickets = result;
+			selectedEvent = JsonConvert.DeserializeObject<EventViewModel>(serializedEvent);
+		}
+	}
 
 	public async Task StartReadingCookie()
 	{
@@ -99,16 +118,25 @@ else if (cart == null)
 		{
 			var responseBody = await response.Content.ReadAsStringAsync();
 			EventViewModel? eventVM = JsonConvert.DeserializeObject<EventViewModel?>(responseBody);
+
 			return eventVM;
 		}
 		return null;
 	}
 
-
-	public int totalPrice()
+	public int totalPrice(string eventName, int quantity)
 	{
-		int totalPrice = Event.TicketPrice;
+		if (Event == null) return 0;
 
+
+
+		int eventPrice = Event.TicketPrice * quantity;
+		int totalPrice = cart.Sum(kvp => kvp.Key == eventName ? eventPrice : kvp.Value * Event.TicketPrice);
 		return totalPrice;
 	}
+
+
+
+
+
 }

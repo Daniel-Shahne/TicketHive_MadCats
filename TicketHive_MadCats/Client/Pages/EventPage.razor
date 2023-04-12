@@ -1,6 +1,7 @@
 ﻿@page "/EventPage/{Id:int}"
 @using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
+@using System.Web;
 @using TicketHive_MadCats.Client.Cookies;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject HttpClient client
@@ -54,7 +55,11 @@
                     <span style="color:green">Ticket(s) are booked!</span>
                 }
             </div>
-            <button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart page!</button>
+            <button>
+                <a href="@($"/CartPage?event={Uri.EscapeDataString(JsonConvert.SerializeObject(Event))}")">Go to cart</a>
+                @*<button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart page!</button>*@
+            </button>
+
         }
     }
     else
@@ -137,7 +142,13 @@
     {
         formSubmitted = true;
         await cookieInterpreter.UpdateCookieForSingleEvent(Event.Name, myNumber);
+
+        var serializedEvent = JsonConvert.SerializeObject(Event);
+        var uri = navMan.ToAbsoluteUri($"/CartPage?event={Uri.EscapeDataString(serializedEvent)}&tickets={myNumber}");
+        navMan.NavigateTo(uri.ToString());
+
     }
+
 
     public int totalEvents()
     {
