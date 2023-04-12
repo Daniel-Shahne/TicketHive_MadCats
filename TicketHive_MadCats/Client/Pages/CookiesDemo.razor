@@ -28,6 +28,10 @@
 <br />
 <button @onclick="ReadCookie">Read the cookie</button>
 
+
+<br />
+<button @onclick="TestSingleEventUpdate">Test out new for single event!</button>
+
 @code {
     // Variables to contain stuff that UI displays
     public string? testMessage;
@@ -91,5 +95,13 @@
     public async Task ReadCookie()
     {
         retrievedCart = await cookieInt.ReadCookie();
+    }
+
+
+    // Tests the new for single event method
+    public async Task TestSingleEventUpdate()
+    {
+        cartDict = await cookieInt.UpdateCookieForSingleEvent(EventName, EventQuantity);
+        Console.WriteLine("nada");
     }
 }
