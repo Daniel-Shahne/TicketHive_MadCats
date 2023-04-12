@@ -1,5 +1,6 @@
 ﻿@page "/EventPage/{Id:int}"
 @using Newtonsoft.Json;
+@using TicketHive_MadCats.Client.Cookies;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject HttpClient client
 @inject NavigationManager navMan
@@ -34,7 +35,7 @@
 
             }
             <br />
-            <form onsubmit="@HandleSubmit">
+            <div>
                 <label for="numberInput">Quantity:</label>
                 <input type="number" id="numberInput" @bind-value="@myNumber" @bind-value:event="oninput"/>
                 @if (showWarning)
@@ -43,11 +44,9 @@
                 }
                 @if ((myNumber <= Event.MaxTickets - Event.BookedTickets) && myNumber >0)
                 {
-                    <button type="submit">book @myNumber</button>
-
-
+                    <button @onclick="HandleSubmit">book @myNumber</button>
                 }
-            </form>
+            </div>
             @*<button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart</button>*@
         }
     }
@@ -74,6 +73,13 @@
     public int Id { get; set; }
     [Inject]
     HttpClient codeClient { get; set; }
+    [Inject]
+    IJSRuntime jS { get; set; }
+    [Inject]
+    NavigationManager navMana { get; set; }
+
+    CookieInterpreter? cookieInterpreter;
+
     public EventViewModel? Event;
     public List<string> ImgPaths;
     public string IndexUrl { get; set; } = "/";
@@ -89,6 +95,11 @@
         Event = await GetOneEvent();
         DeserializeImgs();
 
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        cookieInterpreter = new(jS);
     }
 
     public void DeserializeImgs()
@@ -114,16 +125,9 @@
 
     }
 
-    private void HandleSubmit()
+    private async Task HandleSubmit()
     {
-        if (myNumber == 0)
-        {
-            showWarning = true;
-        }
-        else
-        {
-            showWarning = false;
-        }
+        await cookieInterpreter.UpdateCookieForSingleEvent(Event.Name, myNumber);
     }
 
 
