@@ -1,0 +1,46 @@
+﻿@page "/CartPage"
+@using TicketHive_MadCats.Client.Cookies
+@inject IJSRuntime JsRuntime
+
+<h3>CartPage</h3>
+
+@if(cart != null)
+{
+	@foreach(var kvp in cart)
+	{
+		<spam>Event @kvp.Key | @kvp.Value in cart </spam>
+	}
+}
+
+
+
+@code {
+	[Inject]
+	public IJSRuntime jS { get; set; }
+	public CookieInterpreter? cookieInt;
+	public Dictionary<string, int>? cart;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		cookieInt = new(jS);
+		StartReadingCookie();
+	}
+
+
+	public async Task StartReadingCookie()
+	{
+		Dictionary<string, int>? response = await cookieInt.ReadCookie();
+
+		if(response != null)
+		{
+			cart = response;
+		}
+		else
+		{
+			await cookieInt.CreateCookie();
+			cart = new();
+		}
+	}
+
+
+}

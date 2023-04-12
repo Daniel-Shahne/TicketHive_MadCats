@@ -3,6 +3,7 @@
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject HttpClient client
 @inject NavigationManager navMan
+@inject IJSRuntime JSRuntime
 
 <body>
     @if (Event != null)
@@ -33,14 +34,27 @@
 
             }
             <br />
-            <button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart</button>
+            <form onsubmit="@HandleSubmit">
+                <label for="numberInput">Quantity:</label>
+                <input type="number" id="numberInput" @bind-value="@myNumber" @bind-value:event="oninput"/>
+                @if (showWarning)
+                {
+                    <span style="color:red">Please enter a number</span>
+                }
+                @if ((myNumber <= Event.MaxTickets - Event.BookedTickets) && myNumber >0)
+                {
+                    <button type="submit">book @myNumber</button>
+
+
+                }
+            </form>
+            @*<button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart</button>*@
         }
     }
     else
     {
         <h3>Loading events... </h3>
     }
-
     <div>
         <button @onclick="() => navMan.NavigateTo(IndexUrl)" style="margin: 10px;">Go to HomePage</button>
     </div>
@@ -64,6 +78,11 @@
     public List<string> ImgPaths;
     public string IndexUrl { get; set; } = "/";
     public string CartUrl { get; set; } = "/Cart";
+
+    private int myNumber;
+    private bool showWarning = false;
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,6 +114,17 @@
 
     }
 
+    private void HandleSubmit()
+    {
+        if (myNumber == 0)
+        {
+            showWarning = true;
+        }
+        else
+        {
+            showWarning = false;
+        }
+    }
 
 
 }
