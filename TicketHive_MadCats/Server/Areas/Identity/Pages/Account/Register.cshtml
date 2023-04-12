@@ -3,16 +3,36 @@
 @{
 }
 
-<h1>Register</h1>
 
-<form method="post">
-    <label for="input-username">Username:</label>
-    <input id="input-username" type="text" asp-for="Username" />
-    <label for="input-password">Password:</label>
-    <input id="input-password" type="password" asp-for="Password" />
-    <input type="submit" value="Register" />
-    <div>
-        <span class="text-danger" asp-validation-for="Username"></span>
-        <span class="text-danger" asp-validation-for="Password"></span>
-    </div>
-</form>
+<body>
+    <h1>Register</h1>
+
+    <form method="post">
+        <label for="input-username">Username:</label>
+        <input id="input-username" type="text" asp-for="Username" />
+        <label for="input-password">Password:</label>
+        <input id="input-password" type="password" asp-for="Password" />
+        <input type="submit" value="Register" />
+        <div>
+            <span class="text-danger" asp-validation-for="Username"></span>
+            <span class="text-danger" asp-validation-for="Password"></span>
+        </div>
+        <br />
+        <div class="form-group">
+            <label asp-for="SelectedCountry" class="control-label"> Country:</label>
+            <select asp-for="SelectedCountry" asp-items="@(new SelectList(Model.ListOfCountries))" class="form-control"></select>
+            <span asp-validation-for="SelectedCountry" class="text-danger"></span>
+        </div>
+    </form>
+</body>
+
+    <style>
+        html, body {
+            background-color: #F0F0F0;
+            color: #305076;
+        }
+
+    .navbar {
+        background-color: #305076;
+        color: #F0F0F0;
+    </style>

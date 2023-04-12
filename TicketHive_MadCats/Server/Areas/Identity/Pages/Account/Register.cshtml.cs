@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using TicketHive_MadCats.Server.Models;
+using TicketHive_MadCats.Shared.Statics;
 
 namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
 {
@@ -19,6 +20,12 @@ namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
         [Required(ErrorMessage = "Password is required")]
         [MinLength(5, ErrorMessage = "Password must be at least 5 characters")]
         public string? Password { get; set; }
+
+        [Required(ErrorMessage = "Please select a country")]
+        public string? SelectedCountry { get; set; }
+
+        public List<string> ListOfCountries = CountriesAndCodes.getListOfCountries;
+
 
         public RegisterModel(SignInManager<CustomUser> signInManager)
         {
@@ -47,7 +54,7 @@ namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
 
                     if (signInResult.Succeeded)
                     {
-                        return Redirect("~/");
+                        return Redirect("/Homepage");
                     }
                 }
             }
