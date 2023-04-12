@@ -15,4 +15,11 @@
         <span class="text-danger" asp-validation-for="Username"></span>
         <span class="text-danger" asp-validation-for="Password"></span>
     </div>
+    <br />
+    <div class="form-group">
+        <label asp-for="SelectedCountry" class="control-label"> Country:</label>
+        <select asp-for="SelectedCountry" asp-items="@(new SelectList(Model.ListOfCountries))" class="form-control"></select>
+        <span asp-validation-for="SelectedCountry" class="text-danger"></span>
+    </div>
+
 </form>
