@@ -13,12 +13,13 @@ function createCookie() {
 // are in the cart
 function updateCookie(value){
     // Sets an expiration date of 120 minutes
-    let date = new Date();
-    date.setTime(date.getTime() + (7200000));
-    expires = "; expires=" + date.toUTCString();
+    //let date = new Date();
+    //date.setTime(date.getTime() + (7200000));
+    //expires = "; expires=" + date.toUTCString();
 
     // Creates the cookie with the value and expiration date
-    document.cookie = `cart=${value}${expires}`
+    /*document.cookie = `cart=${value}${expires}`*/
+    document.cookie = `cart=${value}`
 }
 
 // Returns ALL cookies and needs to be filtered
