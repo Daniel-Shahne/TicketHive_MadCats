@@ -63,6 +63,13 @@ public class EventRepository : IEventRepo
         return await _context.Events.Include(e => e.Tickets).FirstOrDefaultAsync(e => e.Id == id);
     }
 
+    public async Task<EventModel?> GetOneEventByName(string eventName)
+    {
+        return await _context.Events.Include(e => e.Tickets).FirstOrDefaultAsync(e => e.Name == eventName);
+    }
+
+
+
     //inkluderar tickets
     //public async Task<EventModel?> GetOneEventByIdWithTickets(int id)
     //{

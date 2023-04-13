@@ -18,6 +18,14 @@ namespace TicketHive_MadCats.Server.Repos.RepoInterfaces
         public Task<EventModel?> GetOneEventById(int id);
 
         /// <summary>
+        /// Searches the EventTicket database for an event of
+        /// given name
+        /// </summary>
+        /// <param name="eventName">Name of the event to search for</param>
+        /// <returns>The event as an Eventmodel if found, null otherwise</returns>
+        public Task<EventModel?> GetOneEventByName(string eventName);
+
+        /// <summary>
         /// Gets all events
         /// </summary>
         /// <returns></returns>
