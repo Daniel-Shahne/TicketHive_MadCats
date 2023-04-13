@@ -25,7 +25,8 @@
 					<button @onclick="@(async () => await RemoveAllFromCart(kvp.Key))">Remove all in cart</button>
 				</div>
 			</div>
-			<button @onclick="@(async () => await RemoveEveryCart())">Remove everything</button>
+			<button style="width: 100px; height: 50px;" @onclick="@(async () => await RemoveEveryCart())">Remove everything</button>
+
 		}
 		@foreach(var cartEvent in cartEvents)
 		{
