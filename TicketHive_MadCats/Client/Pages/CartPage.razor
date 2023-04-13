@@ -23,6 +23,7 @@
 					<div>
 						<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
 						<button @onclick="@(async () => await AddToCart(kvp.Key))">Add</button>
+						<button @onclick="@(async () => await RemoveAllFromCart(kvp.Key))">Remove all in cart</button>
 					</div>
 				</div>
 			}
@@ -32,6 +33,7 @@
 	</div>
 
 	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
+	<button style="width: 100px; height: 50px;" @onclick="@(async () => await RemoveEveryCart())">Remove everything</button>
 
 	// ENDA RADEN SOM BEHÖVS FÖR ATT ÄNDRA VARUKORG
 	@*cart = await cookieInt.UpdateCookieForSingleEvent(eventName, quantity)*@
@@ -108,6 +110,18 @@ else if (cart == null)
 		cart = await cookieInt.UpdateCookieForSingleEvent(eventName, 1);
 	}
 
+	public async Task RemoveAllFromCart(string eventName)
+	{
+		cart.Remove(eventName);
+		await cookieInt.UpdateCookie(cart);
+	}
+
+	public async Task RemoveEveryCart()
+	{
+		cart = new Dictionary<string, int>();
+		await cookieInt.UpdateCookie(cart);
+	}
+
 	public int TotalCartPrice()
 	{
 		if (cart == null) return 0;
@@ -144,13 +158,20 @@ else if (cart == null)
 		return null;
 	}
 
-	public int totalPrice(EventViewModel? Event, int quantity)
+	public int totalEvents()
 	{
-		if (Event == null)
-			return 0;
+		int TotalEvent = Event.MaxTickets - Event.BookedTickets;
 
-		int totalPrice = Event.TicketPrice * quantity;
-		return totalPrice;
+		return TotalEvent;
 	}
+
+	//public int totalPrice(EventViewModel? Event, int quantity)
+	//{
+	//	if (Event == null)
+	//		return 0;
+
+	//	int totalPrice = Event.TicketPrice * quantity;
+	//	return totalPrice;
+	//}
 
 }
