@@ -6,6 +6,7 @@
 @using TicketHive_MadCats.Client.Cookies
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject IJSRuntime JsRuntime
+@inject NavigationManager navMan
 
 <h3>CartPage</h3>
 
@@ -26,6 +27,7 @@
 		}
 
 	</div>
+	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
 
 	// ENDA RADEN SOM BEHÖVS FÖR ATT ÄNDRA VARUKORG
 	@*cart = await cookieInt.UpdateCookieForSingleEvent(eventName, quantity)*@
@@ -33,6 +35,8 @@
 else if (cart != null && cart.Count == 0)
 {
 	<span>Your cart is empty</span>
+
+	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
 }
 else if (cart == null)
 {
@@ -48,11 +52,12 @@ else if (cart == null)
 	public IJSRuntime jS { get; set; }
 	[Inject]
 	HttpClient codeClient { get; set; }
-
 	public CookieInterpreter? cookieInt;
 	public Dictionary<string, int>? cart = null;
-
 	public EventViewModel? Event;
+	public string BookUrl { get; set; } = "/BookingPage";
+
+
 
 
 
