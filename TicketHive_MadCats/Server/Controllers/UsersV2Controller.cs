@@ -40,22 +40,30 @@ namespace TicketHive_MadCats.Server.Controllers
                 return BadRequest($"Could not find user {deserializedBody.Username}");
             }
 
-            // Compares the sent current password to the users actual current password
-            // Returns Unauthorized if password is wrong
-            bool correctPassword = await userManager.CheckPasswordAsync(user, deserializedBody.CurrentPassword);
-            if (!correctPassword)
+            // Changes the passwords if both are not null
+            if(deserializedBody.Password != null && deserializedBody.CurrentPassword != null)
             {
-                return Unauthorized("Current password is wrong");
+                // Compares the sent current password to the users actual current password
+                // Returns Unauthorized if password is wrong
+                bool correctPassword = await userManager.CheckPasswordAsync(user, deserializedBody.CurrentPassword);
+                if (!correctPassword)
+                {
+                    return Unauthorized("Current password is wrong");
+                }
+
+                // Changes users password, returns Conflict if failed
+                var changePassResult = await userManager.ChangePasswordAsync(user, deserializedBody.CurrentPassword, deserializedBody.Password);
+                if (!changePassResult.Succeeded)
+                {
+                    return Conflict("Could not change password");
+                }
             }
 
-            // Changes users country
-            user.Country = deserializedBody.Country;
-
-            // Changes users password, returns Conflict if failed
-            var changePassResult = await userManager.ChangePasswordAsync(user, deserializedBody.CurrentPassword, deserializedBody.Password);
-            if(!changePassResult.Succeeded)
+            // Changes country if it isnt null
+            if(deserializedBody.Country != null)
             {
-                return Conflict("Could not change password");
+                // Changes users country
+                user.Country = deserializedBody.Country;
             }
 
             // Saves all the changes, returns Conflict if failed

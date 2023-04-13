@@ -10,23 +10,20 @@ namespace TicketHive_MadCats.Shared.Models
 {
 	public class UpdateUserModel
 	{
-
+		[Required(ErrorMessage = "User name required / User not authenticated")]
 		[JsonProperty("username")]
 		public string Username { get; set; } = null!;
 
-		[Required]
         [MinLength(13, ErrorMessage = "Passwords are atleast 13 characters long")]
         [JsonProperty("currentPassword")]
-		public string CurrentPassword { get; set; } = null!;
+		public string? CurrentPassword { get; set; }
 
-		[Required(ErrorMessage = "Must have a password")]
 		[MinLength(13, ErrorMessage = "Password must be atleast 13 characters long")]
-        [RegularExpression(@"^(?=.*[A-Z])(?=.*[@#£$%&!]).+$", ErrorMessage = "The {0} field must contain at least one capital letter and one of the following symbols: @ # £ $ % & !")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*[#£$%&!]).+$", ErrorMessage = "Password must contain at least one capital letter and one of the following symbols: # £ $ % & !")]
         [JsonProperty("password")]
-		public string Password { get; set; } = null!;
+		public string? Password { get; set; }
 
-		[Required(ErrorMessage = "Must have a country selected")]
 		[JsonProperty("country")]
-		public string Country { get; set; } = null!;
+		public string? Country { get; set; }
 	}
 }
