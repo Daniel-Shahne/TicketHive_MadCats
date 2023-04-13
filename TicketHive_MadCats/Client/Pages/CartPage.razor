@@ -12,7 +12,7 @@
 
 @if(cart != null && cart.Count > 0)
 {
-	<div class="row text-center justify-content-center border-2 border-dark">
+	<div class="row text-center justify-content-center border border-2 border-dark m-2 p-2">
 		@foreach (var cartEvent in cartEvents)
 		{
 			@foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
@@ -30,6 +30,7 @@
 		}
 		<br>
 		<span>Total price for everything: @TotalCartPrice()</span>
+		<button style="width: 100px; height: 50px;" @onclick="() => navMan.NavigateTo(ConfirmUrl)">Pay</button>
 	</div>
 
 	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
@@ -62,6 +63,7 @@ else if (cart == null)
 	public Dictionary<string, int>? cart = null;
 	public EventViewModel? Event;
 	public string BookUrl { get; set; } = "/BookingPage";
+	public string ConfirmUrl { get; set; } = "/ConfirmPage";
 	private List<EventViewModel>? allEvents = new();
 	private List<EventViewModel>? cartEvents;
 
