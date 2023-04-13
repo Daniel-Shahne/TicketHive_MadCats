@@ -22,8 +22,10 @@
 				<div>
 					<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
 					<button @onclick="@(async () => await AddToCart(kvp.Key))">Add</button>
+					<button @onclick="@(async () => await RemoveAllFromCart(kvp.Key))">Remove all in cart</button>
 				</div>
 			</div>
+			<button @onclick="@(async () => await RemoveEveryCart())">Remove everything</button>
 		}
 
 	</div>
@@ -82,6 +84,18 @@ else if (cart == null)
 
 			cart = new();
 		}
+	}
+
+	public async Task RemoveEveryCart()
+	{
+		cart = new Dictionary<string, int>();
+		await cookieInt.UpdateCookie(cart);
+	}
+
+	public async Task RemoveAllFromCart(string eventName)
+	{
+		cart.Remove(eventName);
+		await cookieInt.UpdateCookie(cart);
 	}
 
 	public async Task RemoveFromCart(string eventName)
