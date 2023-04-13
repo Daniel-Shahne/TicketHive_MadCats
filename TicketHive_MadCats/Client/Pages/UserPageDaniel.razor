@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Authorization;
+@using Newtonsoft.Json;
 @using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.Statics;
 
@@ -13,9 +14,11 @@
 {
     <EditForm Model="@updateModel" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
-@*        <ValidationSummary />
-*@
         <div class="form-group">
+            <label for="oldpassword">Current Password:</label>
+            <InputText id="oldpassword" class="form-control" @bind-Value="@updateModel.CurrentPassword" />
+            <ValidationMessage For="@(() => updateModel.CurrentPassword)" />
+            
             <label for="password">New Password:</label>
             <InputText id="password" class="form-control" @bind-Value="@updateModel.Password" />
             <ValidationMessage For="@(() => updateModel.Password)" />
@@ -31,6 +34,15 @@
 
         <button type="submit" class="btn btn-primary">Submit</button>
     </EditForm>
+
+    if(serverErrorMessage != null)
+    {
+        <div>Request failed. Server message: @serverErrorMessage</div>
+    }
+    if (displaySuccessMessage)
+    {
+        <div>Successfully changed credentials!</div>
+    }
 }
 else
 {
@@ -55,6 +67,8 @@ else
     // Variables for dynamic use
     string newPassword = "";
     string newCountry = "";
+    string? serverErrorMessage;
+    bool displaySuccessMessage = false;
 
     // Sets userName to logged in users username
     protected override async Task OnInitializedAsync()
@@ -71,8 +85,21 @@ else
         updateModel.Username = user.Identity.Name;
     }
 
-    public void HandleValidSubmit()
+    public async Task HandleValidSubmit()
     {
-        
+        string serializedUpdateObj = JsonConvert.SerializeObject(updateModel);
+        var response = await httpClient.PutAsJsonAsync("/api/UsersV2", serializedUpdateObj);
+        var status = response.StatusCode;
+
+        if(status == System.Net.HttpStatusCode.OK)
+        {
+            serverErrorMessage = null;
+            displaySuccessMessage = true;
+        }
+        else
+        {
+            serverErrorMessage = await response.Content.ReadAsStringAsync();
+            displaySuccessMessage = false;
+        }
     }
 }
