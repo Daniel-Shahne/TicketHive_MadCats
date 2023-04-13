@@ -1,8 +1,12 @@
 ﻿@page "/EventPage/{Id:int}"
+@using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
+@using TicketHive_MadCats.Client.Cookies;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject HttpClient client
 @inject NavigationManager navMan
+@inject IJSRuntime JSRuntime
+@attribute [Authorize]
 
 <body>
     @if (Event != null)
@@ -25,7 +29,7 @@
             <br />
             <h2>Date: @Event.Date</h2>
             <br />
-            <h2>Tickets available: @Event.MaxTickets</h2>
+            <h2>Tickets available: @totalEvents();</h2>
             <br />
             @foreach (var ImgPath in ImgPaths)
             {
@@ -33,14 +37,30 @@
 
             }
             <br />
-            <button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart</button>
+            <div>
+                <label for="numberInput">Quantity:</label>
+                <input type="number" id="numberInput" @bind-value="@myNumber" @bind-value:event="oninput"/>
+                @if (showWarning)
+                {
+                    <span style="color:red">Please enter a number</span>
+                }
+                @if ((myNumber <= Event.MaxTickets - Event.BookedTickets) && myNumber >0)
+                {
+                    <button @onclick="HandleSubmit">book @myNumber</button>
+
+                }
+                @if (formSubmitted)
+                {
+                    <span style="color:green">Ticket(s) are booked!</span>
+                }
+            </div>
+            <button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart page!</button>
         }
     }
     else
     {
         <h3>Loading events... </h3>
     }
-
     <div>
         <button @onclick="() => navMan.NavigateTo(IndexUrl)" style="margin: 10px;">Go to HomePage</button>
     </div>
@@ -60,16 +80,34 @@
     public int Id { get; set; }
     [Inject]
     HttpClient codeClient { get; set; }
+    [Inject]
+    IJSRuntime jS { get; set; }
+    [Inject]
+    NavigationManager navMana { get; set; }
+
+    CookieInterpreter? cookieInterpreter;
+
     public EventViewModel? Event;
     public List<string> ImgPaths;
     public string IndexUrl { get; set; } = "/";
-    public string CartUrl { get; set; } = "/Cart";
+    public string CartUrl { get; set; } = "/Cartpage";
+
+    private int myNumber;
+    private bool showWarning = false;
+    private bool formSubmitted;
+
+
 
     protected override async Task OnInitializedAsync()
     {
         Event = await GetOneEvent();
         DeserializeImgs();
 
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        cookieInterpreter = new(jS);
     }
 
     public void DeserializeImgs()
@@ -95,6 +133,16 @@
 
     }
 
+    private async Task HandleSubmit()
+    {
+        formSubmitted = true;
+        await cookieInterpreter.UpdateCookieForSingleEvent(Event.Name, myNumber);
+    }
 
+    public int totalEvents()
+    {
+        int TotalEvent = Event.MaxTickets - Event.BookedTickets;
 
+        return TotalEvent;
+    }
 }

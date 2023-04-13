@@ -1,8 +1,10 @@
 ﻿@page "/BookingPage"
+@using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject HttpClient injectedClient
 @inject NavigationManager navMan
+@attribute [Authorize]
 
 
 

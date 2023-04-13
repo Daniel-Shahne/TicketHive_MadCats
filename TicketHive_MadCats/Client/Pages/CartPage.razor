@@ -1,0 +1,177 @@
+﻿@page "/CartPage"
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Authorization;
+@using Newtonsoft.Json;
+@using TicketHive_MadCats.Client.Cookies
+@using TicketHive_MadCats.Shared.ViewModels;
+@inject IJSRuntime JsRuntime
+@inject NavigationManager navMan
+
+<h3>CartPage</h3>
+
+@if(cart != null && cart.Count > 0)
+{
+	<div class="row text-center justify-content-center border-2 border-dark">
+		@foreach (var cartEvent in cartEvents)
+		{
+			@foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
+			{
+				<div>
+					<span>Event @kvp.Key | @kvp.Value tickets in cart |Individual ticket price: @cartEvent.TicketPrice | Total ticket price: @CalculateTotalPrice(kvp.Value, cartEvent.TicketPrice)</span>
+					<br>
+					<div>
+						<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
+						<button @onclick="@(async () => await AddToCart(kvp.Key))">Add</button>
+						<button @onclick="@(async () => await RemoveAllFromCart(kvp.Key))">Remove all in cart</button>
+					</div>
+				</div>
+			}
+		}
+		<br>
+		<span>Total price for everything: @TotalCartPrice()</span>
+	</div>
+
+	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
+	<button style="width: 100px; height: 50px;" @onclick="@(async () => await RemoveEveryCart())">Remove everything</button>
+
+	// ENDA RADEN SOM BEHÖVS FÖR ATT ÄNDRA VARUKORG
+	@*cart = await cookieInt.UpdateCookieForSingleEvent(eventName, quantity)*@
+}
+else if (cart != null && cart.Count == 0)
+{
+	<span>Your cart is empty</span>
+
+	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
+}
+else if (cart == null)
+{
+	<span>Loading cart...</span>
+}
+
+
+
+@code {
+	[Parameter]
+	public int Id { get; set; }
+	[Inject]
+	public IJSRuntime jS { get; set; }
+	[Inject]
+	HttpClient codeClient { get; set; }
+	public CookieInterpreter? cookieInt;
+	public Dictionary<string, int>? cart = null;
+	public EventViewModel? Event;
+	public string BookUrl { get; set; } = "/BookingPage";
+	private List<EventViewModel>? allEvents = new();
+	private List<EventViewModel>? cartEvents;
+
+
+
+
+
+	protected override async Task OnParametersSetAsync()
+	{
+		cookieInt = new(jS);
+		allEvents = await GetAllEvents();
+		await StartReadingCookie();
+
+		// filter the list of all events to get only those events that are in the cart
+		if (cart != null)
+		{
+			cartEvents = allEvents.Where(e => cart.ContainsKey(e.Name)).ToList();
+		}
+	}
+
+
+	public async Task StartReadingCookie()
+	{
+		Dictionary<string, int>? response = await cookieInt.ReadCookie();
+
+		if(response != null)
+		{
+			cart = response;
+		}
+		else
+		{
+
+			cart = new();
+		}
+	}
+
+	public async Task RemoveFromCart(string eventName)
+	{
+		int newQuantity = cart[eventName] - 1;
+		cart = await cookieInt.UpdateCookieForSingleEvent(eventName, -1);
+	}
+
+	public async Task AddToCart(string eventName)
+	{
+		int newQuantity = cart[eventName] + 1;
+		cart = await cookieInt.UpdateCookieForSingleEvent(eventName, 1);
+	}
+
+	public async Task RemoveAllFromCart(string eventName)
+	{
+		cart.Remove(eventName);
+		await cookieInt.UpdateCookie(cart);
+	}
+
+	public async Task RemoveEveryCart()
+	{
+		cart = new Dictionary<string, int>();
+		await cookieInt.UpdateCookie(cart);
+	}
+
+	public int TotalCartPrice()
+	{
+		if (cart == null) return 0;
+
+		int totalPrice = 0;
+		foreach (var cartEvent in cartEvents)
+		{
+			foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
+			{
+				int quantity = kvp.Value;
+				int ticketPrice = cartEvent.TicketPrice;
+				int itemTotalPrice = CalculateTotalPrice(quantity, ticketPrice);
+				totalPrice += itemTotalPrice;
+			}
+		}
+		return totalPrice;
+	}
+
+	public int CalculateTotalPrice(int quantity, int ticketPrice)
+	{
+		return quantity * ticketPrice;
+	}
+
+	public async Task<List<EventViewModel>> GetAllEvents()
+	{
+		var response = await codeClient.GetAsync("api/Events");
+		var statusCode = response.StatusCode;
+		if (statusCode == System.Net.HttpStatusCode.OK)
+		{
+			var responseBody = await response.Content.ReadAsStringAsync();
+			List<EventViewModel?> eventVM = JsonConvert.DeserializeObject<List<EventViewModel?>>(responseBody);
+			return eventVM;
+		}
+		return null;
+	}
+
+	public int totalEvents()
+	{
+		int TotalEvent = Event.MaxTickets - Event.BookedTickets;
+
+		return TotalEvent;
+	}
+
+	//public int totalPrice(EventViewModel? Event, int quantity)
+	//{
+	//	if (Event == null)
+	//		return 0;
+
+	//	int totalPrice = Event.TicketPrice * quantity;
+	//	return totalPrice;
+	//}
+
+}
