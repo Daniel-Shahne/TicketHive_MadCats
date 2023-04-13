@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
+@using System.Text.RegularExpressions;
 @using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.Statics;
 
@@ -12,18 +13,27 @@
 
 @if (true)
 {
-    <EditForm Model="@updateModel" OnValidSubmit="HandleValidSubmit">
+    if (errorsList.Any())
+    {
+        foreach(string error in errorsList)
+        {
+            <div>@error</div>
+        }
+    }
+
+    <EditForm Model="@updateModel" OnSubmit="HandleSubmit">
         <DataAnnotationsValidator />
         <div class="form-group">
             <label for="oldpassword">Current Password:</label>
-            <InputText id="oldpassword" class="form-control" @bind-Value="@updateModel.CurrentPassword" />
+            <InputText id="oldpassword" class="form-control" @bind-Value="@oldPassword" />
             <ValidationMessage For="@(() => updateModel.CurrentPassword)" />
             
             <label for="password">New Password:</label>
-            <InputText id="password" class="form-control" @bind-Value="@updateModel.Password" />
+            <InputText id="password" class="form-control" @bind-Value="@newPassword" />
             <ValidationMessage For="@(() => updateModel.Password)" />
 
-            <InputSelect id="select" class="form-control" @bind-Value="@updateModel.Country">
+            <InputSelect id="select" class="form-control" @bind-Value="@newCountry">
+                <option value=""></option>
                 @foreach(string country in countries)
                 {
                     <option value="@country">@country</option>
@@ -65,10 +75,15 @@ else
     public List<string> countries = CountriesAndCodes.getListOfCountries;
 
     // Variables for dynamic use
-    string newPassword = "";
-    string newCountry = "";
     string? serverErrorMessage;
     bool displaySuccessMessage = false;
+
+    // Variables bound to input values
+    string oldPassword = "";
+    string newPassword = "";
+    string newCountry = "";
+
+
 
     // Sets userName to logged in users username
     protected override async Task OnInitializedAsync()
@@ -85,8 +100,61 @@ else
         updateModel.Username = user.Identity.Name;
     }
 
-    public async Task HandleValidSubmit()
+
+
+
+    // List of errors to diplay, populated by HandleSubmit
+    List<string> errorsList = new();
+
+    // Regex for use in password creation
+    Regex capitalRegex = new Regex("[A-Z]");
+    Regex specialCharRegex = new Regex("[¤%&$!#]");
+
+
+
+    public async Task HandleSubmit()
     {
+        // Clears any previous errors
+        errorsList.Clear();
+
+        // Checks if oldpassword and newpassword are not empty
+        // Skip password setting otherwise
+        // Also fills or clears errorslist
+        if(!oldPassword.Equals("") || !newPassword.Equals(""))
+        {
+            if (oldPassword.Length < 13) errorsList.Add("Current password is at least 13 characters");
+            if (newPassword.Length < 13) errorsList.Add("New password should be at least 13 characters");
+            if (!specialCharRegex.IsMatch(newPassword)) errorsList.Add("New password must contain one of the symbols: ¤ % & $ ! #");
+            if (!capitalRegex.IsMatch(newPassword)) errorsList.Add("New password must contain at least one capital letter");
+
+            if (errorsList.Any()) return;
+
+            updateModel.CurrentPassword = oldPassword;
+            updateModel.Password = newPassword;
+        }
+        else
+        {
+            updateModel.Password = null;
+            updateModel.CurrentPassword = null;
+        }
+
+        // Sets country if one is chosen
+        if(!newCountry.Equals(""))
+        {
+            updateModel.Country = newCountry;
+        }
+        else
+        {
+            updateModel.Country = null;
+        }
+
+        // If all fields are null then display error
+        if(updateModel.Country == null && updateModel.CurrentPassword == null && updateModel.Password == null)
+        {
+            errorsList.Add("No changes are to be made");
+            return;
+        }
+
         string serializedUpdateObj = JsonConvert.SerializeObject(updateModel);
         var response = await httpClient.PutAsJsonAsync("/api/UsersV2", serializedUpdateObj);
         var status = response.StatusCode;
