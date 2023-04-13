@@ -17,7 +17,7 @@
 		@foreach (var kvp in cart)
 		{
 			<div>
-				<span>Event @kvp.Key | @kvp.Value in cart | @totalPrice(Event, kvp.Value) </span>
+				<span>Event @kvp.Key | @kvp.Value in cart) </span>
 				<br>
 				<div>
 					<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
@@ -26,6 +26,10 @@
 				</div>
 			</div>
 			<button @onclick="@(async () => await RemoveEveryCart())">Remove everything</button>
+		}
+		@foreach(var cartEvent in cartEvents)
+		{
+			<span>@cartEvent.TicketPrice</span>
 		}
 
 	</div>
@@ -58,6 +62,8 @@ else if (cart == null)
 	public Dictionary<string, int>? cart = null;
 	public EventViewModel? Event;
 	public string BookUrl { get; set; } = "/BookingPage";
+	private List<EventViewModel>? allEvents = new();
+	private List<EventViewModel>? cartEvents;
 
 
 
@@ -66,8 +72,14 @@ else if (cart == null)
 	protected override async Task OnParametersSetAsync()
 	{
 		cookieInt = new(jS);
-		Event = await GetOneEvent();
+		allEvents = await GetAllEvents();
 		await StartReadingCookie();
+
+		// filter the list of all events to get only those events that are in the cart
+		if (cart != null)
+		{
+			cartEvents = allEvents.Where(e => cart.ContainsKey(e.Name)).ToList();
+		}
 	}
 
 
@@ -110,14 +122,14 @@ else if (cart == null)
 		cart = await cookieInt.UpdateCookieForSingleEvent(eventName, 1);
 	}
 
-	public async Task<EventViewModel?> GetOneEvent()
+	public async Task<List<EventViewModel>> GetAllEvents()
 	{
-		var response = await codeClient.GetAsync($"api/Events/{Id}");
+		var response = await codeClient.GetAsync("api/Events");
 		var statusCode = response.StatusCode;
 		if (statusCode == System.Net.HttpStatusCode.OK)
 		{
 			var responseBody = await response.Content.ReadAsStringAsync();
-			EventViewModel? eventVM = JsonConvert.DeserializeObject<EventViewModel?>(responseBody);
+			List<EventViewModel?> eventVM = JsonConvert.DeserializeObject<List<EventViewModel?>>(responseBody);
 			return eventVM;
 		}
 		return null;
