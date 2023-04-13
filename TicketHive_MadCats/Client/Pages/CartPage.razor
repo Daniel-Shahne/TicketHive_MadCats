@@ -63,6 +63,8 @@ else if (cart == null)
 	HttpClient codeClient { get; set; }
 	[Inject]
 	AuthenticationStateProvider authStateProvider { get; set; }
+	[Inject]
+	NavigationManager navManInCode { get; set; }
 
 
 	public CookieInterpreter? cookieInt;
@@ -130,11 +132,12 @@ else if (cart == null)
 			}
 			else
 			{
-				listOfResponses.Add($"Successfully booked {kvp.Key} tickets to {kvp.Value}!");
+				listOfResponses.Add($"Successfully booked {kvp.Value} tickets to {kvp.Key}!");
 			}
-
-
 		}
+
+		string serializedLOR = JsonConvert.SerializeObject(listOfResponses);
+		navManInCode.NavigateTo($"/ConfirmationPage/{serializedLOR}");
 	}
 
 
