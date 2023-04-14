@@ -22,6 +22,17 @@ namespace TicketHive_MadCats.Server.Controllers
             this.userManager = userManager;
         }
 
+        [HttpGet("{username}")]
+        public async Task<ActionResult<string>> GetCountry(string username)
+        {
+            var user = await userManager.FindByNameAsync(username);
+            if (user != null)
+            {
+                return Ok(user.Country);
+            }
+            else return NotFound($"Could not find any user with name {username}");
+        }
+
         // PUT api/<UsersV2Controller>/5
         [HttpPut]
         public async Task<ActionResult> Put([FromBody]string updateUserModel)
