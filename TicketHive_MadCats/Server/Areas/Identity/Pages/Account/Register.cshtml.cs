@@ -42,7 +42,8 @@ namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
             {
                 CustomUser newUser = new()
                 {
-                    UserName = Username
+                    UserName = Username,
+                    Country = SelectedCountry
                 };
 
                 var registerResult = await signInManager.UserManager.CreateAsync(newUser, Password!);
