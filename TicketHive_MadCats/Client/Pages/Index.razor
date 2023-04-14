@@ -10,28 +10,34 @@
 
 <body>
     <h1 style="color: #305076;">Welcome to Ticket Hive!</h1>
+    <img src="/images/logos/yellow.png" alt="TicketHiveLogo" width="400" height="250">
     <p>
         Here's some information about our app:
-        <em>
-            Make your own damn reservations!
-        </em>
+        <div>
+            <em>
+                Log in or register to be able to book your favourite events today!
+            </em>
+        </div>
     </p>
     <!-- Lägg till appens logga här typ -->
-    <img src="/images/logos/yellow.png" alt="TicketHiveLogo" width="250" height="250">
-    <p>Get started by logging in or registering:</p>
-@*    <div>
-        <h2>Click on the login or register button on top of the navigation bar!</h2>
-    </div>*@
+    @*<img src="/images/logos/yellow.png" alt="TicketHiveLogo" width="400" height="250">*@
+    <p>Get started by logging in or registering.</p>
 
-    <AuthorizeView Roles="Admin">
-        <button @onclick="() => navMan.NavigateTo(AdminViewUrl)">Go to admin view</button>
-    </AuthorizeView>
+    <div>
+        <AuthorizeView Roles="Admin">
+            <button class="btn btn-primary" @onclick="() => navMan.NavigateTo(AdminViewUrl)">Visit Admin page</button>
+        </AuthorizeView>
+    </div>
 </body>
+
+<div>
+    <button class="btn btn-primary" style="margin-top: 10px" @onclick="() => navMan.NavigateTo(HomeUrl)">Visit Homepage</button>
+</div>
 
 <style>
     html, body {
-        background-color: #F0F0F0;
-        color: #305076;
+        background-color: #305076;
+        color: #fbe89c;
 
     }
     .btn-login, .btn-register {
@@ -52,4 +58,6 @@
 
 @code{
     public string AdminViewUrl { get; set; } = "/AdminView";
+
+    public string HomeUrl { get; set; } = "/Homepage";
 }

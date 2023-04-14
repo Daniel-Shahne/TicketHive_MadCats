@@ -1,6 +1,6 @@
-﻿body {
+﻿body-admin {
     background-color: #305076;
-    color: #305076;
+    color: #fbe89c;
 }
 
 .form-control-admin {
@@ -72,3 +72,6 @@ th-admin {
 
 
 
+/*
+    Nedan CSS kod är ämnad för Index sidan
+*/

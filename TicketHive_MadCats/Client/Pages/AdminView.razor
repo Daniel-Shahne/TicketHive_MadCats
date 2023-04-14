@@ -12,86 +12,101 @@
 @inject AuthenticationStateProvider authStateProvider
 @inject IJSRuntime JSRuntime
 
-<img class="logo-admin" src="images/logos/yellow.png" alt="Business Logo" />
-<div class="header-container">
-    <h3 class="admin-header">Admin Page</h3>
-</div>
+
+<body>
+    <img class="logo-admin" src="images/logos/yellow.png" alt="Business Logo" />
+    <div class="header-container">
+        <h3 class="admin-header">Admin Page</h3>
+    </div>
 
 
 
 
-<div class="form-container">
-    <EditForm Model="@eventModel" OnValidSubmit="CreateEvent">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label>Event Name</label>
-            <InputText @bind-Value="eventModel.Name" class="form-control" />
-        </div>
-        <div>
-            <label>Event Type</label>
-            <InputText @bind-Value="eventModel.EventType" class="form-control" />
-        </div>
-        <div>
-            <label>Ticket Price</label>
-            <InputNumber @bind-Value="eventModel.TicketPrice" class="form-control" />
-        </div>
-        <div>
-            <label>Event Location</label>
-            <InputText @bind-Value="eventModel.Location" class="form-control" />
-        </div>
-        <div>
-            <label>Event Date</label>
-            <InputDate @bind-Value="eventModel.Date" class="form-control" />
-        </div>
-        <div>
-            <label>Max Capacity of Event</label>
-            <InputNumber @bind-Value="eventModel.MaxTickets" class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-primary">Create Event</button>
-    </EditForm>
-</div>
+    <div class="form-container">
+        <EditForm Model="@eventModel" OnValidSubmit="CreateEvent">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label>Event Name</label>
+                <InputText @bind-Value="eventModel.Name" class="form-control" />
+            </div>
+            <div>
+                <label>Event Type</label>
+                <InputText @bind-Value="eventModel.EventType" class="form-control" />
+            </div>
+            <div>
+                <label>Ticket Price</label>
+                <InputNumber @bind-Value="eventModel.TicketPrice" class="form-control" />
+            </div>
+            <div>
+                <label>Event Location</label>
+                <InputText @bind-Value="eventModel.Location" class="form-control" />
+            </div>
+            <div>
+                <label>Event Date</label>
+                <InputDate @bind-Value="eventModel.Date" class="form-control" />
+            </div>
+            <div>
+                <label>Max Capacity of Event</label>
+                <InputNumber @bind-Value="eventModel.MaxTickets" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary">Create Event</button>
+        </EditForm>
+    </div>
 
-<div>
-    <h3 class="admin-header">@statusMessage</h3>
-</div>
+    <div>
+        <h3 class="admin-header">@statusMessage</h3>
+    </div>
 
 
-<div class="form-container">
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Date</th>
-            <th>Location</th>
-            <th>Ticket Price</th>
-            <th>Max Tickets</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var evt in Events)
-        {
-            <tr>
-                <td>@evt.Name</td>
-                <td>@evt.EventType</td>
-                <td>@evt.Date.ToShortDateString()</td>
-                <td>@evt.Location</td>
-                <td>@evt.TicketPrice</td>
-                <td>@evt.MaxTickets</td>
-                <td>
-                    <button class="btn btn-danger" @onclick="@(() => DeleteEvent(evt.Id))">Delete</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-</div>
+    <div class="form-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Ticket Price</th>
+                    <th>Max Tickets</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var evt in Events)
+                {
+                    <tr>
+                        <td>@evt.Name</td>
+                        <td>@evt.EventType</td>
+                        <td>@evt.Date.ToShortDateString()</td>
+                        <td>@evt.Location</td>
+                        <td>@evt.TicketPrice</td>
+                        <td>@evt.MaxTickets</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="@(() => DeleteEvent(evt.Id))">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
-<div>
-    <h3 class="admin-header">@deleteStatusMessage</h3>
-</div>
+    <div>
+        <h3 class="admin-header">@deleteStatusMessage</h3>
+    </div>
+
+    <div>
+        <button class="btn btn-primary" @onclick="() => navMan.NavigateTo(HomeUrl)">Visit Homepage</button>
+    </div>
+</body>
+
+<style>
+    html, body {
+        background-color: #305076;
+        color: #fbe89c;
+    }
+</style>
+
 
 
 @code {
@@ -135,6 +150,7 @@
     private string statusMessage = string.Empty;
     private string deleteStatusMessage = string.Empty;
     private bool confirmDeleteVisible = false;
+    private string HomeUrl { get; set; } = "/Homepage";
 
     private async Task CreateEvent()
     {
