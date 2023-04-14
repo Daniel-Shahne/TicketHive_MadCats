@@ -36,7 +36,7 @@
 			}
 		}
 		<br>
-		<span>Total price for everything: @TotalCartPrice()</span>
+		<span>Total price for everything: @totalPriceFV @convertCurrencyTo</span>
 		<button style="width: 100px; height: 50px;" @onclick="() => PayStuff()">Pay</button> @*Går till confirm TODO*@
 	</div>
 
@@ -87,7 +87,7 @@ else if (cart == null)
 	string username;
 	string convertCurrencyTo;
 	public Dictionary<string, double>? ticketPricesDict;
-	public int totalPriceFV;
+	public double totalPriceFV;
 
 
 	protected override async Task OnParametersSetAsync()
@@ -209,6 +209,8 @@ else if (cart == null)
 		}
 
 		await localStorage.UpdateCartLSAsync(cart);
+
+		await TotalCartPrice();
 	}
 
 	public async Task AddToCart(string eventName)
@@ -222,6 +224,8 @@ else if (cart == null)
 		}
 
 		await localStorage.UpdateCartLSAsync(cart);
+
+		await TotalCartPrice();
 	}
 
 	public async Task RemoveAllFromCart(string eventName)
@@ -230,6 +234,8 @@ else if (cart == null)
 		//await cookieInt.UpdateCookie(cart);
 
 		await localStorage.UpdateCartLSAsync(cart);
+
+		await TotalCartPrice();
 	}
 
 	public async Task RemoveEveryCart()
@@ -240,11 +246,11 @@ else if (cart == null)
 		await localStorage.UpdateCartLSAsync(cart);
 	}
 
-	public int TotalCartPrice()
+	public async Task TotalCartPrice()
 	{
-		if (cart == null) return 0;
+		if (cart == null) totalPriceFV = 0;
 
-		int totalPrice = 0;
+		double totalPrice = 0;
 		foreach (var cartEvent in cartEvents)
 		{
 			foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
@@ -255,7 +261,13 @@ else if (cart == null)
 				totalPrice += itemTotalPrice;
 			}
 		}
-		return totalPrice;
+
+		if (!convertCurrencyTo.Equals("SEK"))
+		{
+			totalPrice = await ConvertApiCaller.ConvertSekToCurrencyAsyncIntOnly(convertCurrencyTo, totalPrice);
+		}
+
+		totalPriceFV = totalPrice;
 	}
 
 	public int CalculateTotalPrice(int quantity, int ticketPrice)
