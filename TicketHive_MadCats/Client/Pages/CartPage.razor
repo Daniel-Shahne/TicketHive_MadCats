@@ -2,6 +2,7 @@
 @attribute [Authorize]
 
 @using Blazored.LocalStorage;
+@using BusinessLogic;
 @using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Client.Cookies
@@ -17,12 +18,14 @@
 @if(cart != null && cart.Count > 0)
 {
 	<div class="row text-center justify-content-center border border-2 border-dark m-2 p-2">
+		@*Loopar över varje eventviewmodel som finns i vår cart*@
 		@foreach (var cartEvent in cartEvents)
 		{
+			@*Loopar över det dictionary objekt som har samma namn som EVM som loopas över?*@
 			@foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
 			{
 				<div>
-					<span>Event @kvp.Key | @kvp.Value tickets in cart |Individual ticket price: @cartEvent.TicketPrice | Total ticket price: @CalculateTotalPrice(kvp.Value, cartEvent.TicketPrice)</span>
+					<span>Event @kvp.Key | @kvp.Value tickets in cart |Individual ticket price: @ticketPricesDict[kvp.Key] @convertCurrencyTo |)</span>
 					<br>
 					<div>
 						<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
@@ -39,9 +42,6 @@
 
 	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
 	<button style="width: 100px; height: 50px;" @onclick="@(async () => await RemoveEveryCart())">Remove everything</button>
-
-	// ENDA RADEN SOM BEHÖVS FÖR ATT ÄNDRA VARUKORG
-	@*cart = await cookieInt.UpdateCookieForSingleEvent(eventName, quantity)*@
 }
 else if (cart != null && cart.Count == 0)
 {
@@ -82,15 +82,16 @@ else if (cart == null)
 	private List<EventViewModel>? allEvents = new();
 	private List<EventViewModel>? cartEvents;
 
-
-
+	// Price conversion stuff
+	string country;
+	string username;
+	string convertCurrencyTo;
+	public Dictionary<string, double>? ticketPricesDict;
+	public int totalPriceFV;
 
 
 	protected override async Task OnParametersSetAsync()
 	{
-		//cookieInt = new(jS);
-		//await StartReadingCookie();
-
 		localStorage = new(injLocalStorage);
 		var responseDict = await localStorage.ReadCartLSAsync();
 		if (responseDict != null && responseDict.Any())
@@ -108,6 +109,39 @@ else if (cart == null)
 		if (cart != null && cart.Any())
 		{
 			cartEvents = allEvents.Where(e => cart.ContainsKey(e.Name)).ToList();
+		}
+
+		// Price conversion stuff
+		var user = await authStateProvider.GetAuthenticationStateAsync();
+		if (user != null)
+		{
+			username = user.User.Identity.Name;
+
+			var response = await codeClient.GetAsync($"api/usersv2/{username}");
+			var body = await response.Content.ReadAsStringAsync();
+			country = body;
+
+			if (country.Equals("United Kingdom")) convertCurrencyTo = "GBP";
+			else if (country.Equals("Sweden")) convertCurrencyTo = "SEK";
+			else convertCurrencyTo = "EUR";
+		}
+
+		if (cart != null && cart.Any())
+		{
+			ticketPricesDict = new();
+			foreach(var kvp in cart)
+			{
+				int price = cartEvents.First(evm => evm.Name == kvp.Key).TicketPrice;
+
+				if (convertCurrencyTo.Equals("SEK"))
+				{
+					ticketPricesDict[kvp.Key] = price;
+				}
+				else
+				{
+					ticketPricesDict[kvp.Key] = await ConvertApiCaller.ConvertSekToCurrencyAsyncIntOnly(convertCurrencyTo, price);
+				}
+			}
 		}
 	}
 
@@ -161,23 +195,6 @@ else if (cart == null)
 
 		navManInCode.NavigateTo($"/ConfirmationPage/{serializedLOR}");
 	}
-
-
-	//public async Task StartReadingCookie()
-	//{
-	//	//Dictionary<string, int>? response = await cookieInt.ReadCookie();
-	//	Dictionary<string, int>? response = await localStorage.ReadCartLSAsync();
-
-	//	if(response != null)
-	//	{
-	//		cart = response;
-	//	}
-	//	else
-	//	{
-
-	//		cart = new();
-	//	}
-	//}
 
 	public async Task RemoveFromCart(string eventName)
 	{
@@ -265,14 +282,4 @@ else if (cart == null)
 
 		return TotalEvent;
 	}
-
-	//public int totalPrice(EventViewModel? Event, int quantity)
-	//{
-	//	if (Event == null)
-	//		return 0;
-
-	//	int totalPrice = Event.TicketPrice * quantity;
-	//	return totalPrice;
-	//}
-
 }
