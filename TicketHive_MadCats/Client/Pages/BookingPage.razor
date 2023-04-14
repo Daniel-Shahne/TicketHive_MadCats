@@ -1,9 +1,11 @@
 ﻿@page "/BookingPage"
+@using BusinessLogic;
 @using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject HttpClient injectedClient
 @inject NavigationManager navMan
+@inject AuthenticationStateProvider injAuthProvider
 @attribute [Authorize]
 
 
@@ -32,7 +34,17 @@
                         <h3>@events.Name</h3>
                     </a>
                     @*Ändra priset till landets egna valuta*@
-                    <p>@events.TicketPrice kr </p>
+                    <p>
+                        @if(eventPrices != null)
+                        {
+                            <span>@eventPrices[events.Name]</span>
+                        }
+                        else
+                        {
+                            <span>@events.TicketPrice</span>
+                        }
+                        @convertCurrencyTo
+                    </p>
                     <p>@events.Date</p>
                     <em>@events.Location</em>
                     <br>
@@ -69,13 +81,50 @@
     private List<EventViewModel>? events = new();
     public EventViewModel? Event;
     public List<string> ImgPaths;
-    // HttpClient codeClient { get; set; }
+
+    string? username;
+    string? country;
+    string? convertCurrencyTo;
+
+    [Inject]
+    HttpClient codeClient { get; set; }
+    [Inject]
+    AuthenticationStateProvider authStateProvider { get; set; }
+
+    Dictionary<string, double>? eventPrices;
 
     protected override async Task OnInitializedAsync()
     {
         allEvents = await GetAllEvents();
         events = allEvents;
         //DeserializeImgs();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var user = await authStateProvider.GetAuthenticationStateAsync();
+        if (user != null)
+        {
+            username = user.User.Identity.Name;
+
+            var response = await codeClient.GetAsync($"api/usersv2/{username}");
+            var body = await response.Content.ReadAsStringAsync();
+            country = body;
+
+            if (country.Equals("United Kingdom")) convertCurrencyTo = "GBP";
+            else if (country.Equals("Sweden")) convertCurrencyTo = "SEK";
+            else convertCurrencyTo = "EUR";
+
+            // Need to populate a dictionary with country price values
+            if (!convertCurrencyTo.Equals("SEK"))
+            {
+                eventPrices = new();
+                foreach (EventViewModel eventVM in allEvents)
+                {
+                    eventPrices.Add(eventVM.Name, await ConvertApiCaller.ConvertSekToCurrencyAsyncIntOnly(convertCurrencyTo, eventVM.TicketPrice));
+                }
+            }
+        }
     }
 
     private void FilterByLowestPrice()
