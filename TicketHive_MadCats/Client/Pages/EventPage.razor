@@ -1,5 +1,6 @@
 ﻿@page "/EventPage/{Id:int}"
 @using Blazored.LocalStorage;
+@using BusinessLogic;
 @using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Client.Cookies;
@@ -8,6 +9,7 @@
 @inject NavigationManager navMan
 @inject IJSRuntime JSRuntime
 @inject ILocalStorageService injLocalService
+@inject AuthenticationStateProvider injAuth
 @attribute [Authorize]
 
 <body>
@@ -25,7 +27,15 @@
             <br />
             <h2>Event type: @Event.EventType</h2>
             <br />
-            <h2>Event Price: @Event.TicketPrice kr</h2>
+            <h2>Event Price: @if(ticketForeignPrice != null)
+                {
+                    <span>@ticketForeignPrice</span> @convertCurrencyTo
+                }
+                else
+                {
+                    <span>@Event.TicketPrice</span> @convertCurrencyTo
+                }
+            </h2>
             <br />
             <h2>Location: @Event.Location</h2>
             <br />
@@ -88,6 +98,8 @@
     NavigationManager navMana { get; set; }
     [Inject]
     ILocalStorageService localService { get; set; }
+    [Inject]
+    AuthenticationStateProvider authStateProvider { get; set; }
 
 
     // Cookies stuff
@@ -104,7 +116,10 @@
     private bool showWarning = false;
     private bool formSubmitted;
 
-
+    public string convertCurrencyTo;
+    public string country;
+    public string username;
+    public double? ticketForeignPrice;
 
     protected override async Task OnInitializedAsync()
     {
@@ -120,6 +135,25 @@
 
         cart = await cookieLocalStorage.ReadCartLSAsync();
         if (cart == null) cart = new();
+
+        var user = await authStateProvider.GetAuthenticationStateAsync();
+        if (user != null)
+        {
+            username = user.User.Identity.Name;
+
+            var response = await codeClient.GetAsync($"api/usersv2/{username}");
+            var body = await response.Content.ReadAsStringAsync();
+            country = body;
+
+            if (country.Equals("United Kingdom")) convertCurrencyTo = "GBP";
+            else if (country.Equals("Sweden")) convertCurrencyTo = "SEK";
+            else convertCurrencyTo = "EUR";
+
+            if (!convertCurrencyTo.Equals("SEK"))
+            {
+                ticketForeignPrice = await ConvertApiCaller.ConvertSekToCurrencyAsyncIntOnly(convertCurrencyTo, Event.TicketPrice);
+            }
+        }
     }
 
     public void DeserializeImgs()
