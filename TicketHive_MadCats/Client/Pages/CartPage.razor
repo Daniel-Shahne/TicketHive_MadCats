@@ -1,12 +1,14 @@
 ﻿@page "/CartPage"
 @attribute [Authorize]
 
+@using Blazored.LocalStorage;
 @using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Client.Cookies
 @using TicketHive_MadCats.Shared.Models;
 @using TicketHive_MadCats.Shared.ViewModels;
 @inject IJSRuntime JsRuntime
+@inject ILocalStorageService injLocalService
 @inject NavigationManager navMan
 @inject AuthenticationStateProvider injAuthStateProvider
 
@@ -65,10 +67,15 @@ else if (cart == null)
 	AuthenticationStateProvider authStateProvider { get; set; }
 	[Inject]
 	NavigationManager navManInCode { get; set; }
+	[Inject]
+	ILocalStorageService injLocalStorage { get; set; }
 
 
 	public CookieInterpreter? cookieInt;
+	CookiesLocalStorage localStorage;
 	public Dictionary<string, int>? cart = null;
+
+
 	public EventViewModel? Event;
 	public string BookUrl { get; set; } = "/BookingPage";
 	public string ConfirmUrl { get; set; } = "/ConfirmPage";
@@ -81,12 +88,24 @@ else if (cart == null)
 
 	protected override async Task OnParametersSetAsync()
 	{
-		cookieInt = new(jS);
+		//cookieInt = new(jS);
+		//await StartReadingCookie();
+
+		localStorage = new(injLocalStorage);
+		var responseDict = await localStorage.ReadCartLSAsync();
+		if (responseDict != null && responseDict.Any())
+		{
+			cart = responseDict;
+		}
+		else
+		{
+			cart = new();
+		}
+
 		allEvents = await GetAllEvents();
-		await StartReadingCookie();
 
 		// filter the list of all events to get only those events that are in the cart
-		if (cart != null)
+		if (cart != null && cart.Any())
 		{
 			cartEvents = allEvents.Where(e => cart.ContainsKey(e.Name)).ToList();
 		}
@@ -137,47 +156,71 @@ else if (cart == null)
 		}
 
 		string serializedLOR = JsonConvert.SerializeObject(listOfResponses);
+
+		await localStorage.DeleteCookie();
+
 		navManInCode.NavigateTo($"/ConfirmationPage/{serializedLOR}");
 	}
 
 
-	public async Task StartReadingCookie()
-	{
-		Dictionary<string, int>? response = await cookieInt.ReadCookie();
+	//public async Task StartReadingCookie()
+	//{
+	//	//Dictionary<string, int>? response = await cookieInt.ReadCookie();
+	//	Dictionary<string, int>? response = await localStorage.ReadCartLSAsync();
 
-		if(response != null)
-		{
-			cart = response;
-		}
-		else
-		{
+	//	if(response != null)
+	//	{
+	//		cart = response;
+	//	}
+	//	else
+	//	{
 
-			cart = new();
-		}
-	}
+	//		cart = new();
+	//	}
+	//}
 
 	public async Task RemoveFromCart(string eventName)
 	{
-		int newQuantity = cart[eventName] - 1;
-		cart = await cookieInt.UpdateCookieForSingleEvent(eventName, -1);
+		//int newQuantity = cart[eventName] - 1;
+		//cart = await cookieInt.UpdateCookieForSingleEvent(eventName, -1);
+
+		if (cart.ContainsKey(eventName))
+		{
+			cart[eventName] -= 1;
+
+			if (cart[eventName] <= 0) cart.Remove(eventName);
+		}
+
+		await localStorage.UpdateCartLSAsync(cart);
 	}
 
 	public async Task AddToCart(string eventName)
 	{
-		int newQuantity = cart[eventName] + 1;
-		cart = await cookieInt.UpdateCookieForSingleEvent(eventName, 1);
+		//int newQuantity = cart[eventName] + 1;
+		//cart = await cookieInt.UpdateCookieForSingleEvent(eventName, 1);
+
+		if (cart.ContainsKey(eventName))
+		{
+			cart[eventName] += 1;
+		}
+
+		await localStorage.UpdateCartLSAsync(cart);
 	}
 
 	public async Task RemoveAllFromCart(string eventName)
 	{
 		cart.Remove(eventName);
-		await cookieInt.UpdateCookie(cart);
+		//await cookieInt.UpdateCookie(cart);
+
+		await localStorage.UpdateCartLSAsync(cart);
 	}
 
 	public async Task RemoveEveryCart()
 	{
 		cart = new Dictionary<string, int>();
-		await cookieInt.UpdateCookie(cart);
+		//await cookieInt.UpdateCookie(cart);
+
+		await localStorage.UpdateCartLSAsync(cart);
 	}
 
 	public int TotalCartPrice()
