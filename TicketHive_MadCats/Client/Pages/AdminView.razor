@@ -12,62 +12,52 @@
 @inject AuthenticationStateProvider authStateProvider
 @inject IJSRuntime JSRuntime
 
-
-<h3>AdminView</h3>
-
-@*<button @onclick="testEventEndpoints">Test all endpoints</button>
-
-<br />
-<label for="ticketDeleteNumberInput">Id of ticket to delete (0 if no deletion)</label>
-<input id="ticketDeleteNumberInput" type="number" @bind="ticketToDelete"/>
-
-<br />
-<label for="testPostCheckbox">Test booking 2 tickets to event 1 (maxtickets 5)</label>
-<input id="testPostCheckbox" type="checkbox" @bind="testPost" />
-
-<div>Event API test result: @eventApiTestStatus</div>
-<div>Tickets API test result: @ticketApiTestStatus</div>*@
+<img class="logo-admin" src="images/logos/yellow.png" alt="Business Logo" />
+<div class="header-container">
+    <h3 class="admin-header">Admin Page</h3>
+</div>
 
 
 
-<EditForm Model="@eventModel" OnValidSubmit="CreateEvent">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label>Event Name</label>
-        <InputText @bind-Value="eventModel.Name" class="form-control"/>
-    </div>
-    <div>
-        <label>Event Type</label>
-        <InputText @bind-Value="eventModel.EventType" class="form-control" />
-    </div>
-    <div>
-        <label>Ticket Price</label>
-        <InputNumber @bind-Value="eventModel.TicketPrice" class="form-control" />
-    </div>
-    <div>
-        <label>Event Location</label>
-        <InputText @bind-Value="eventModel.Location" class="form-control" />
-    </div>
-    <div>
-        <label>Event Date</label>
-        <InputDate @bind-Value="eventModel.Date" class="form-control" />
-    </div>
-@*    <div>
-        <label>Event Images</label>
-        <InputText @bind-Value="eventModel.ImageSrcs" class="form-control" />
-    </div>*@
-    <div>
-        <label>Max Capacity of Event</label>
-        <InputNumber @bind-Value="eventModel.MaxTickets" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Create Event</button>
-</EditForm>
 
-<h3>@statusMessage</h3>
+<div class="form-container">
+    <EditForm Model="@eventModel" OnValidSubmit="CreateEvent">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label>Event Name</label>
+            <InputText @bind-Value="eventModel.Name" class="form-control" />
+        </div>
+        <div>
+            <label>Event Type</label>
+            <InputText @bind-Value="eventModel.EventType" class="form-control" />
+        </div>
+        <div>
+            <label>Ticket Price</label>
+            <InputNumber @bind-Value="eventModel.TicketPrice" class="form-control" />
+        </div>
+        <div>
+            <label>Event Location</label>
+            <InputText @bind-Value="eventModel.Location" class="form-control" />
+        </div>
+        <div>
+            <label>Event Date</label>
+            <InputDate @bind-Value="eventModel.Date" class="form-control" />
+        </div>
+        <div>
+            <label>Max Capacity of Event</label>
+            <InputNumber @bind-Value="eventModel.MaxTickets" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Create Event</button>
+    </EditForm>
+</div>
+
+<div>
+    <h3 class="admin-header">@statusMessage</h3>
+</div>
 
 
-
+<div class="form-container">
 <table class="table">
     <thead>
         <tr>
@@ -97,9 +87,11 @@
         }
     </tbody>
 </table>
+</div>
 
-<h3>@deleteStatusMessage</h3>
-
+<div>
+    <h3 class="admin-header">@deleteStatusMessage</h3>
+</div>
 
 
 @code {
