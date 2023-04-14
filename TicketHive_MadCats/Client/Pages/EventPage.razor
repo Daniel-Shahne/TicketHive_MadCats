@@ -1,4 +1,5 @@
 ﻿@page "/EventPage/{Id:int}"
+@using Blazored.LocalStorage;
 @using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
 @using TicketHive_MadCats.Client.Cookies;
@@ -6,6 +7,7 @@
 @inject HttpClient client
 @inject NavigationManager navMan
 @inject IJSRuntime JSRuntime
+@inject ILocalStorageService injLocalService
 @attribute [Authorize]
 
 <body>
@@ -84,8 +86,14 @@
     IJSRuntime jS { get; set; }
     [Inject]
     NavigationManager navMana { get; set; }
+    [Inject]
+    ILocalStorageService localService { get; set; }
 
+
+    // Cookies stuff
     CookieInterpreter? cookieInterpreter;
+    CookiesLocalStorage? cookieLocalStorage;
+    Dictionary<string, int> cart;
 
     public EventViewModel? Event;
     public List<string> ImgPaths;
@@ -108,6 +116,10 @@
     protected override async Task OnParametersSetAsync()
     {
         cookieInterpreter = new(jS);
+        cookieLocalStorage = new(localService);
+
+        cart = await cookieLocalStorage.ReadCartLSAsync();
+        if (!cart.Any()) cart = new();
     }
 
     public void DeserializeImgs()
@@ -136,7 +148,18 @@
     private async Task HandleSubmit()
     {
         formSubmitted = true;
-        await cookieInterpreter.UpdateCookieForSingleEvent(Event.Name, myNumber);
+        //await cookieInterpreter.UpdateCookieForSingleEvent(Event.Name, myNumber);
+
+        if (cart.ContainsKey(Event.Name))
+        {
+            cart[Event.Name] += myNumber;
+        }
+        else
+        {
+            cart.Add(Event.Name, myNumber);
+        }
+
+        await cookieLocalStorage.UpdateCartLSAsync(cart);
     }
 
     public int totalEvents()
