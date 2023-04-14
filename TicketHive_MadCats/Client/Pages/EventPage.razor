@@ -93,7 +93,7 @@
     // Cookies stuff
     CookieInterpreter? cookieInterpreter;
     CookiesLocalStorage? cookieLocalStorage;
-    Dictionary<string, int> cart;
+    Dictionary<string, int>? cart;
 
     public EventViewModel? Event;
     public List<string> ImgPaths;
@@ -119,7 +119,7 @@
         cookieLocalStorage = new(localService);
 
         cart = await cookieLocalStorage.ReadCartLSAsync();
-        if (!cart.Any()) cart = new();
+        if (cart == null) cart = new();
     }
 
     public void DeserializeImgs()
