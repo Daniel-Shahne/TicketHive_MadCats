@@ -99,14 +99,13 @@ else if (cart == null)
 		}
 		else
 		{
-			cart = null;
+			cart = new();
 		}
-
 
 		allEvents = await GetAllEvents();
 
 		// filter the list of all events to get only those events that are in the cart
-		if (cart != null)
+		if (cart != null && cart.Any())
 		{
 			cartEvents = allEvents.Where(e => cart.ContainsKey(e.Name)).ToList();
 		}
@@ -164,21 +163,21 @@ else if (cart == null)
 	}
 
 
-	public async Task StartReadingCookie()
-	{
-		//Dictionary<string, int>? response = await cookieInt.ReadCookie();
-		Dictionary<string, int>? response = await localStorage.ReadCartLSAsync();
+	//public async Task StartReadingCookie()
+	//{
+	//	//Dictionary<string, int>? response = await cookieInt.ReadCookie();
+	//	Dictionary<string, int>? response = await localStorage.ReadCartLSAsync();
 
-		if(response != null)
-		{
-			cart = response;
-		}
-		else
-		{
+	//	if(response != null)
+	//	{
+	//		cart = response;
+	//	}
+	//	else
+	//	{
 
-			cart = new();
-		}
-	}
+	//		cart = new();
+	//	}
+	//}
 
 	public async Task RemoveFromCart(string eventName)
 	{
