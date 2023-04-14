@@ -187,6 +187,8 @@ else if (cart == null)
 		if (cart.ContainsKey(eventName))
 		{
 			cart[eventName] -= 1;
+
+			if (cart[eventName] <= 0) cart.Remove(eventName);
 		}
 
 		await localStorage.UpdateCartLSAsync(cart);
