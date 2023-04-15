@@ -1,4 +1,4 @@
-﻿@page "/BookingPage"
+﻿@page "/BookingPage/{initialSearchWord?}"
 @using BusinessLogic;
 @using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
@@ -14,7 +14,7 @@
     <h3>BookingPage</h3>
     <div>
         <label>Search for events:</label>
-        <input type="text" @oninput="FilterEvent" />
+        <input type="text" value="@initialSearchWord" @oninput="FilterEvent" />
         <button @onclick="FilterByHighestPrice">Filter by highest price</button>
         <button @onclick="FilterByLowestPrice">Filter by lowest price</button>
     </div>
@@ -33,6 +33,7 @@
                     <a href="/EventPage/@events.Id">
                         <h3>@events.Name</h3>
                     </a>
+                    <p>@events.EventType</p>
                     @*Ändra priset till landets egna valuta*@
                     <p>
                         @if(eventPrices != null)
@@ -50,7 +51,10 @@
                     <br>
                     @foreach (string path in listOfPaths)
                     {
-                        <img src=@path width="150" height="150" style="margin: 5px" />
+                        if(path != "none")
+                        {
+                            <img src=@path width="150" height="150" style="margin: 5px" />
+                        }
                     }
 
                     @if (events.BookedTickets >= events.MaxTickets)
@@ -72,11 +76,16 @@
 
 <style>
     html, body {
-        background-color: #F0F0F0;
-        color: #305076;
+        background-color: #305076;
+        color: #F0F0F0;
+    }
+
+    h1, h2, h3, a, p, label {
+        color: #fbe89c;
     }
 </style>
 @code {
+
     private List<EventViewModel>? allEvents = new();
     private List<EventViewModel>? events = new();
     public EventViewModel? Event;
@@ -91,13 +100,15 @@
     [Inject]
     AuthenticationStateProvider authStateProvider { get; set; }
 
+    [Parameter]
+    public string? initialSearchWord { get; set; }
+
     Dictionary<string, double>? eventPrices;
 
     protected override async Task OnInitializedAsync()
     {
         allEvents = await GetAllEvents();
         events = allEvents;
-        //DeserializeImgs();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -125,8 +136,15 @@
                 }
             }
         }
-    }
 
+        if(initialSearchWord != null)
+        {
+            FilterEvent(new ChangeEventArgs() { Value = initialSearchWord });
+        }
+    }
+    /// <summary>
+    /// Added methods that Filtered by prices 
+    /// </summary>
     private void FilterByLowestPrice()
     {
         events = allEvents!.Where(p => p.TicketPrice > 1)
@@ -140,7 +158,9 @@
                            .ToList();
     }
 
-
+    /// <summary>
+    /// Added methods that Filtered by events
+    /// </summary>
     private void FilterEvent(ChangeEventArgs e)
     {
         events = allEvents!.Where(p =>
@@ -152,7 +172,10 @@
             ).ToList();
 
     }
-
+    /// <summary>
+    /// Getting all events from API
+    /// </summary>
+    /// <returns></returns>
     public async Task<List<EventViewModel>> GetAllEvents()
     {
         var response = await injectedClient.GetAsync("api/Events");
@@ -165,13 +188,7 @@
         }
         return null;
     }
-    //public void DeserializeImgs()
-    //{
-    //    if (Event != null)
-    //    {
-    //        ImgPaths = JsonConvert.DeserializeObject<List<string>>(Event.ImageSrcs);
-    //    }
-    //}
+
 
     public List<string>? DeserializeImageSrcs(string imageSrcsString)
     {

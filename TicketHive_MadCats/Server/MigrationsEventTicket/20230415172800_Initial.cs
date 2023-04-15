@@ -57,10 +57,10 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                 columns: new[] { "Id", "Date", "EventType", "ImageSrcs", "Location", "MaxTickets", "Name", "TicketPrice" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(628), "Concert", "[\"/images/event images/image-1.png\",\"/images/event images/image-2.png\"]", "Malmö, Sweden", 5, "Rock Concert", 100 },
-                    { 2, new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(680), "Concert", "[\"/images/event images/image-3.png\",\"/images/event images/image-4.png\"]", "Stockholm, Sweden", 2, "Latino Concert", 50 },
-                    { 3, new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(682), "Tournament", "[\"/images/event images/image-5.png\",\"/images/event images/image-6.png\"]", "Krakow, Poland", 100, "Dreamhack", 5000 },
-                    { 4, new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(684), "Exhibition", "[\"/images/event images/image-7.png\",\"/images/event images/image-8.png\"]", "Berlin, Germany", 20, "Art Exhibition", 5 }
+                    { 1, new DateTime(2023, 11, 15, 19, 27, 59, 959, DateTimeKind.Local).AddTicks(7395), "Concert", "[\"/images/event images/image-1.png\",\"/images/event images/image-2.png\"]", "Malmö, Sweden", 5, "Rock Concert", 100 },
+                    { 2, new DateTime(2023, 4, 22, 19, 27, 59, 959, DateTimeKind.Local).AddTicks(7458), "Concert", "[\"/images/event images/image-3.png\",\"/images/event images/image-4.png\"]", "Stockholm, Sweden", 2, "Latino Concert", 50 },
+                    { 3, new DateTime(2026, 4, 15, 19, 27, 59, 959, DateTimeKind.Local).AddTicks(7463), "Tournament", "[\"/images/event images/image-5.png\",\"/images/event images/image-6.png\"]", "Krakow, Poland", 100, "Dreamhack", 5000 },
+                    { 4, new DateTime(2023, 4, 16, 0, 27, 59, 959, DateTimeKind.Local).AddTicks(7467), "Exhibition", "[\"/images/event images/image-7.png\",\"/images/event images/image-8.png\"]", "Berlin, Germany", 20, "Art Exhibition", 5 }
                 });
 
             migrationBuilder.InsertData(

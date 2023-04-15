@@ -110,34 +110,6 @@
 
 
 @code {
-    
-    
-    @*// Injicerar både dessa för användning i ApiTesters
-    [Inject]
-    public HttpClient httpClient { get; set; }
-    [Inject]
-    public AuthenticationStateProvider authInCode { get; set; }
-
-    // Binds to id of ticket to delete
-    public int ticketToDelete { get; set; } = 0;
-
-    // Binds to checking posting or not
-    public bool testPost { get; set; } = false;
-
-    // Används för att visa testernas status på UI't som en bool
-    public bool? eventApiTestStatus = null;
-    public bool? ticketApiTestStatus = null;
-
-    // Testar alla endpoints med testers instanser
-    public async Task testEventEndpoints()
-    {
-        EventApiTester eventTester = new(authInCode, httpClient);
-        eventApiTestStatus = await eventTester.testEndpoints();
-
-        TicketsApiTester ticketTester = new(authInCode, httpClient);
-        ticketApiTestStatus = await ticketTester.testEndpoints(ticketToDelete, testPost);
-    }*@
-    // Injicerar både dessa för användning i ApiTesters
 
     [Inject]
     public HttpClient httpClient { get; set; }
@@ -152,6 +124,12 @@
     private bool confirmDeleteVisible = false;
     private string HomeUrl { get; set; } = "/Homepage";
 
+    /// <summary>
+    /// Creates a new EventModel and saves it to database, without
+    /// any pictures, if successfully able to do so. Displays
+    /// message if successfull. Also updates UI
+    /// </summary>
+    /// <returns></returns>
     private async Task CreateEvent()
     {
         List<string> imageSrcsList = new() {"none", "none"};
@@ -177,11 +155,20 @@
         await EventsInList();
     }
 
+    /// <summary>
+    /// Gets all events and deserializes them
+    /// </summary>
+    /// <returns></returns>
     private async Task EventsInList()
     {
         Events = await httpClient.GetFromJsonAsync<List<EventModel>>("/api/events");
     }
 
+    /// <summary>
+    /// Deletes an event of given Id from database
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     private async Task DeleteEvent(int id)
     {
         if (await JSRuntime.InvokeAsync<bool>("myFunctions.confirmDelete", id))

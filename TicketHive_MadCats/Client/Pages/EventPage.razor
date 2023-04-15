@@ -16,12 +16,7 @@
     @if (Event != null)
 
     {
-
-        @if (Event.BookedTickets >= Event.MaxTickets)
-        {
-            <em class="color text-danger">  Event is fully booked!</em>
-        }
-        else
+        if(true)
         {
             <h2>Name: @Event.Name</h2>
             <br />
@@ -41,12 +36,23 @@
             <br />
             <h2>Date: @Event.Date</h2>
             <br />
-            <h2>Tickets available: @totalEvents();</h2>
+            <h2>
+                @if(Event.BookedTickets >= Event.MaxTickets)
+                {
+                    <span>Event is fully booked</span>
+                }
+                else
+                {
+                    <span>Tickets left: @totalEvents()</span>
+                }
+            </h2>
             <br />
             @foreach (var ImgPath in ImgPaths)
             {
-                <img src=@ImgPath width="250" height="250" style="margin-right: 10px;">
-
+                if(ImgPath != "none")
+                {
+                    <img src=@ImgPath width="250" height="250" style="margin-right: 10px;">
+                }
             }
             <br />
             <div>
@@ -58,12 +64,12 @@
                 }
                 @if ((myNumber <= Event.MaxTickets - Event.BookedTickets) && myNumber >0)
                 {
-                    <button @onclick="HandleSubmit">book @myNumber</button>
+                    <button @onclick="HandleSubmit">Add @myNumber to cart</button>
 
                 }
                 @if (formSubmitted)
                 {
-                    <span style="color:green">Ticket(s) are booked!</span>
+                    <span style="color:yellow">Ticket(s) are added to cart!</span>
                 }
             </div>
             <button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart page!</button>
@@ -82,8 +88,12 @@
 
 <style>
     html, body {
-        background-color: #F0F0F0;
-        color: #305076;
+        background-color: #305076;
+        color: #F0F0F0;
+    }
+
+    h1, h2, h3, a, p, label {
+        color: #fbe89c;
     }
 </style>
 
@@ -102,7 +112,7 @@
     AuthenticationStateProvider authStateProvider { get; set; }
 
 
-    // Cookies stuff
+
     CookieInterpreter? cookieInterpreter;
     CookiesLocalStorage? cookieLocalStorage;
     Dictionary<string, int>? cart;
@@ -121,13 +131,21 @@
     public string username;
     public double? ticketForeignPrice;
 
+    public bool eventFullyBooked;
+    /// <summary>
+    /// Grabbing methods to get one event and then deserializeImgs. 
+    /// </summary>
+    /// <returns></returns>
     protected override async Task OnInitializedAsync()
     {
         Event = await GetOneEvent();
         DeserializeImgs();
 
     }
-
+    /// <summary>
+    /// Grabbing localstorage and getting response. 
+    /// </summary>
+    /// <returns></returns>
     protected override async Task OnParametersSetAsync()
     {
         cookieInterpreter = new(jS);
@@ -163,7 +181,10 @@
             ImgPaths = JsonConvert.DeserializeObject<List<string>>(Event.ImageSrcs);
         }
     }
-
+    /// <summary>
+    /// Getting one event and checks it statuscode 
+    /// </summary>
+    /// <returns></returns>
 
     public async Task<EventViewModel?> GetOneEvent()
     {
@@ -178,11 +199,13 @@
         return null; 
 
     }
-
+    /// <summary>
+    /// Adds and updating cart. 
+    /// </summary>
+    /// <returns></returns>
     private async Task HandleSubmit()
     {
         formSubmitted = true;
-        //await cookieInterpreter.UpdateCookieForSingleEvent(Event.Name, myNumber);
 
         if (cart.ContainsKey(Event.Name))
         {

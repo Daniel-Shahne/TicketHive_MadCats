@@ -7,6 +7,9 @@ using TicketHive_MadCats.Server.Models;
 
 namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Methods to login, and having some error message if user is trying with wrong login credentials 
+    /// </summary>
     [BindProperties]
     public class LoginModel : PageModel
     {
