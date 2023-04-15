@@ -253,14 +253,18 @@ else if (cart == null)
 		if (cart == null) totalPriceFV = 0;
 
 		double totalPrice = 0;
-		foreach (var cartEvent in cartEvents)
+
+		if(cartEvents != null)
 		{
-			foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
+			foreach (var cartEvent in cartEvents)
 			{
-				int quantity = kvp.Value;
-				int ticketPrice = cartEvent.TicketPrice;
-				int itemTotalPrice = CalculateTotalPrice(quantity, ticketPrice);
-				totalPrice += itemTotalPrice;
+				foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
+				{
+					int quantity = kvp.Value;
+					int ticketPrice = cartEvent.TicketPrice;
+					int itemTotalPrice = CalculateTotalPrice(quantity, ticketPrice);
+					totalPrice += itemTotalPrice;
+				}
 			}
 		}
 
