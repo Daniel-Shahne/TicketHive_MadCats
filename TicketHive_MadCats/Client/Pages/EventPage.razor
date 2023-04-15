@@ -16,12 +16,7 @@
     @if (Event != null)
 
     {
-
-        @if (Event.BookedTickets >= Event.MaxTickets)
-        {
-            <em class="color text-danger">  Event is fully booked!</em>
-        }
-        else
+        if(true)
         {
             <h2>Name: @Event.Name</h2>
             <br />
@@ -41,7 +36,16 @@
             <br />
             <h2>Date: @Event.Date</h2>
             <br />
-            <h2>Tickets available: @totalEvents();</h2>
+            <h2>
+                @if(Event.BookedTickets >= Event.MaxTickets)
+                {
+                    <span>Event is fully booked</span>
+                }
+                else
+                {
+                    <span>Tickets left: @totalEvents();</span>
+                }
+            </h2>
             <br />
             @foreach (var ImgPath in ImgPaths)
             {
@@ -120,6 +124,8 @@
     public string country;
     public string username;
     public double? ticketForeignPrice;
+
+    public bool eventFullyBooked;
 
     protected override async Task OnInitializedAsync()
     {

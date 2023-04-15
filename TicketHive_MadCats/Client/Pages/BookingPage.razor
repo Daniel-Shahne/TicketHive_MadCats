@@ -1,4 +1,4 @@
-﻿@page "/BookingPage"
+﻿@page "/BookingPage/{initialSearchWord?}"
 @using BusinessLogic;
 @using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
@@ -14,7 +14,7 @@
     <h3>BookingPage</h3>
     <div>
         <label>Search for events:</label>
-        <input type="text" @oninput="FilterEvent" />
+        <input type="text" value="@initialSearchWord" @oninput="FilterEvent" />
         <button @onclick="FilterByHighestPrice">Filter by highest price</button>
         <button @onclick="FilterByLowestPrice">Filter by lowest price</button>
     </div>
@@ -33,6 +33,7 @@
                     <a href="/EventPage/@events.Id">
                         <h3>@events.Name</h3>
                     </a>
+                    <p>@events.EventType</p>
                     @*Ändra priset till landets egna valuta*@
                     <p>
                         @if(eventPrices != null)
@@ -50,7 +51,10 @@
                     <br>
                     @foreach (string path in listOfPaths)
                     {
-                        <img src=@path width="150" height="150" style="margin: 5px" />
+                        if(path != "none")
+                        {
+                            <img src=@path width="150" height="150" style="margin: 5px" />
+                        }
                     }
 
                     @if (events.BookedTickets >= events.MaxTickets)
@@ -91,6 +95,9 @@
     [Inject]
     AuthenticationStateProvider authStateProvider { get; set; }
 
+    [Parameter]
+    public string? initialSearchWord { get; set; }
+
     Dictionary<string, double>? eventPrices;
 
     protected override async Task OnInitializedAsync()
@@ -124,6 +131,11 @@
                     eventPrices.Add(eventVM.Name, await ConvertApiCaller.ConvertSekToCurrencyAsyncIntOnly(convertCurrencyTo, eventVM.TicketPrice));
                 }
             }
+        }
+
+        if(initialSearchWord != null)
+        {
+            FilterEvent(new ChangeEventArgs() { Value = initialSearchWord });
         }
     }
 

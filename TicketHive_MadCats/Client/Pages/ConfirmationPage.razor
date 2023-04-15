@@ -1,7 +1,10 @@
 ﻿@page "/ConfirmationPage/{serializedList}"
+@using Microsoft.AspNetCore.Authorization;
 @using Newtonsoft.Json;
+@inject NavigationManager injNavMan
+@attribute [Authorize]
 
-<h3>ConfirmationPage</h3>
+<h3>Confirmation Page</h3>
 
 @if(listOfResponses != null)
 {
@@ -9,16 +12,25 @@
     {
         <div>@response</div>
     }
+
+    <button @onclick="GoBackToBookingPage">Go back to booking page</button>
 }
 
 @code {
     [Parameter]
     public string serializedList { get; set; }
+    [Inject]
+    public NavigationManager navMan { get; set; }
 
     public List<string>? listOfResponses;
 
     protected override async Task OnParametersSetAsync()
     {
         listOfResponses = JsonConvert.DeserializeObject<List<string>>(serializedList);
+    }
+
+    public void GoBackToBookingPage()
+    {
+        navMan.NavigateTo("/Bookingpage");
     }
 }

@@ -17,6 +17,10 @@
 
 @if(cart != null && cart.Count > 0)
 {
+	@if (!convertCurrencyTo.Equals("SEK"))
+	{
+		<h4>Please have mercy on our servers! Api requests take time. Press buttons once and wait for updated values</h4>
+	}
 	<div class="row text-center justify-content-center border border-2 border-dark m-2 p-2">
 		@*Loopar över varje eventviewmodel som finns i vår cart*@
 		@foreach (var cartEvent in cartEvents)
