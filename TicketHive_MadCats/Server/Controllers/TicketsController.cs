@@ -33,6 +33,11 @@ namespace TicketHive_MadCats.Server.Controllers
 
 
         // api/Tickets/Ticket5
+        /// <summary>
+        /// Gets one TicketModel of corresponding id, if existing
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("Ticket{id}")]
         [Authorize]
         public async Task<ActionResult<TicketViewModel?>> GetOne(int id)
@@ -52,6 +57,11 @@ namespace TicketHive_MadCats.Server.Controllers
 
 
         // GET api/Tickets/UsernameAdmin
+        /// <summary>
+        /// Gets all TicketModel's with their username property matching userName
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
         [HttpGet("Username{userName}")]
         [Authorize]
         public async Task<ActionResult<List<TicketViewModel>>> GetUserTickets(string userName)
@@ -70,6 +80,11 @@ namespace TicketHive_MadCats.Server.Controllers
 
 
         // POST api/<TicketsController>
+        /// <summary>
+        /// Attempts booking (i.e adding to database) tickets, for an user, of a certain event.
+        /// </summary>
+        /// <param name="bookEventTicketsModel">A BookEventTicketsModel serialized using Newtonsoft</param>
+        /// <returns></returns>
         [HttpPost("book")]
         [Authorize]
         public async Task<ActionResult> Post([FromBody] string bookEventTicketsModel)
@@ -130,8 +145,13 @@ namespace TicketHive_MadCats.Server.Controllers
         }
 
 
-
+        
         // DELETE api/<TicketsController>/5
+        /// <summary>
+        /// Deletes (unbooks) a ticket of given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<ActionResult> Delete(int id)

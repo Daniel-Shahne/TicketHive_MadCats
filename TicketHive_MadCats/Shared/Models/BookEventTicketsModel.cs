@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace TicketHive_MadCats.Shared.Models
 {
+	/// <summary>
+	/// Used for booking tickets to an event by calling tickets API. 
+	/// Needs to be filled in for
+	/// properties Username, Eventname, Quantity.
+	/// </summary>
 	public class BookEventTicketsModel
 	{
 		[JsonProperty("username")]

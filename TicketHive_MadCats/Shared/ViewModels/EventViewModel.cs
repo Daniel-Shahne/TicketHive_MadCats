@@ -9,6 +9,10 @@ using TicketHive_MadCats.Shared.Models;
 
 namespace TicketHive_MadCats.Shared.ViewModels
 {
+    /// <summary>
+    /// Projects an EventModel into an EventViewModel through
+    /// its constructor
+    /// </summary>
     public class EventViewModel
     {
         [JsonProperty("id")]

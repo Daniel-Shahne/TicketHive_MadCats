@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace TicketHive_MadCats.Shared.Models
 {
+	/// <summary>
+	/// Class meant for serialization to communicate with our Usersv2
+	/// controller, for updating an users username/password/country
+	/// </summary>
 	public class UpdateUserModel
 	{
 		// [Required(ErrorMessage = "User name required / User not authenticated")]

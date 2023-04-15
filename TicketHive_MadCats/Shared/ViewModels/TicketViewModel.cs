@@ -9,6 +9,10 @@ using TicketHive_MadCats.Shared.Models;
 
 namespace TicketHive_MadCats.Shared.ViewModels
 {
+    /// <summary>
+    /// Projects a TicketModel to an TicketViewModel through its
+    /// constructor
+    /// </summary>
     public class TicketViewModel
     {
         [JsonProperty("id")]

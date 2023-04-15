@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 
 namespace TicketHive_MadCats.Shared.Models
 {
+    /// <summary>
+    /// For use in database and backend only. Describes each
+    /// ticket. Navigation property to an EventModel wont
+    /// be serialized but contains an Id
+    /// </summary>
     public class TicketModel
     {
         [Key]
