@@ -59,6 +59,15 @@ else
     <h3>Checking user credentials...</h3>
 }
 
+<style>
+    html, body {
+        background-color: #305076;
+        color: #F0F0F0;
+    }
+
+    h1, h2, h3, a, p, label {
+        color: #fbe89c;
+    }</style>
 @code {
 
     [Inject]
@@ -110,7 +119,10 @@ else
     Regex capitalRegex = new Regex("[A-Z]");
     Regex specialCharRegex = new Regex("[¤%&$!#]");
 
-
+    /// <summary>
+    /// A method that updates password and/or country if criteria is met. 
+    /// </summary>
+    /// <returns></returns>
 
     public async Task HandleSubmit()
     {

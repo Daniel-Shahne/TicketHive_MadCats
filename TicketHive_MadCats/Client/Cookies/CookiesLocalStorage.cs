@@ -10,20 +10,14 @@ namespace TicketHive_MadCats.Client.Cookies
         {
             this.localStorage = localStorage;
         }
-
-
-
-
         public async Task UpdateCartLSAsync(Dictionary<string, int> cart) 
         {
             await localStorage.SetItemAsync("cartStorage", cart);
         }
-
         public async Task<Dictionary<string, int>?> ReadCartLSAsync()
         {
             return await localStorage.GetItemAsync<Dictionary<string, int>>("cartStorage");
         }
-
         public async Task DeleteCookie()
         {
             await localStorage.RemoveItemAsync("cartStorage");

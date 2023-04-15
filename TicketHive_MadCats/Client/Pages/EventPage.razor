@@ -69,7 +69,7 @@
                 }
                 @if (formSubmitted)
                 {
-                    <span style="color:green">Ticket(s) are added to cart!</span>
+                    <span style="color:yellow">Ticket(s) are added to cart!</span>
                 }
             </div>
             <button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart page!</button>
@@ -88,8 +88,12 @@
 
 <style>
     html, body {
-        background-color: #F0F0F0;
-        color: #305076;
+        background-color: #305076;
+        color: #F0F0F0;
+    }
+
+    h1, h2, h3, a, p, label {
+        color: #fbe89c;
     }
 </style>
 

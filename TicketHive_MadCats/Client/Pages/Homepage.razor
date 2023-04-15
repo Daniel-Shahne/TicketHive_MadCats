@@ -47,14 +47,12 @@
     </div>
 
     <div class="row text-center justify-content-center">
-        @*Visar bokningar man gjort*@
         <h3>Booked tickets:</h3>
         @if (ShowTicketEvent != null)
         {
             var ticketGroups = ShowTicketEvent.GroupBy(e => e.Name);
             foreach (var group in ticketGroups)
             {
-                // Display the ticket name and the number of tickets in the group
                 <p>@group.Key | @group.Count() Ticket(s)</p>
             }
         }
@@ -75,9 +73,15 @@
         margin-bottom: 10px;
     }
 
-    html, body {
-        background-color: #F0F0F0;
-        color: #305076;
+    html, body
+    {
+        background-color:#305076;
+        color: #F0F0F0;
+    }
+
+    h1, h2,h3,a, p, label
+    {
+        color: #fbe89c;
     }
 </style>
 
