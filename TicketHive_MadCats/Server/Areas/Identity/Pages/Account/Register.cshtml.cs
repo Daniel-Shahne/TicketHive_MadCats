@@ -10,6 +10,9 @@ using TicketHive_MadCats.Shared.Statics;
 
 namespace TicketHive_MadCats.Server.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Creating a register page, most of methods is about validate if there is a user, if not then error message will pop-up!
+    /// </summary>
     [BindProperties]
     public class RegisterModel : PageModel
     {

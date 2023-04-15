@@ -23,7 +23,10 @@
     public NavigationManager navMan { get; set; }
 
     public List<string>? listOfResponses;
-
+    /// <summary>
+    /// Derialize list of responses from a serialized list. 
+    /// </summary>
+    /// <returns></returns>
     protected override async Task OnParametersSetAsync()
     {
         listOfResponses = JsonConvert.DeserializeObject<List<string>>(serializedList);

@@ -108,7 +108,7 @@
     AuthenticationStateProvider authStateProvider { get; set; }
 
 
-    // Cookies stuff
+
     CookieInterpreter? cookieInterpreter;
     CookiesLocalStorage? cookieLocalStorage;
     Dictionary<string, int>? cart;
@@ -128,14 +128,20 @@
     public double? ticketForeignPrice;
 
     public bool eventFullyBooked;
-
+    /// <summary>
+    /// Grabbing methods to get one event and then deserializeImgs. 
+    /// </summary>
+    /// <returns></returns>
     protected override async Task OnInitializedAsync()
     {
         Event = await GetOneEvent();
         DeserializeImgs();
 
     }
-
+    /// <summary>
+    /// Grabbing localstorage and getting response. 
+    /// </summary>
+    /// <returns></returns>
     protected override async Task OnParametersSetAsync()
     {
         cookieInterpreter = new(jS);
@@ -171,7 +177,10 @@
             ImgPaths = JsonConvert.DeserializeObject<List<string>>(Event.ImageSrcs);
         }
     }
-
+    /// <summary>
+    /// Getting one event and checks it statuscode 
+    /// </summary>
+    /// <returns></returns>
 
     public async Task<EventViewModel?> GetOneEvent()
     {
@@ -186,11 +195,13 @@
         return null; 
 
     }
-
+    /// <summary>
+    /// Adds and updating cart. 
+    /// </summary>
+    /// <returns></returns>
     private async Task HandleSubmit()
     {
         formSubmitted = true;
-        //await cookieInterpreter.UpdateCookieForSingleEvent(Event.Name, myNumber);
 
         if (cart.ContainsKey(Event.Name))
         {

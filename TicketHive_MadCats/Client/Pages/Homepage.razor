@@ -92,14 +92,14 @@
     [Inject]
     NavigationManager navManInCode { get; set; }
 
-    //Tanken är att filtrera events
+
     private List<EventViewModel>? allEvents = new();
     private List<EventViewModel>? events = new();
     private List<TicketViewModel>? bookedTickets = new();
     public List<EventViewModel>? ShowTicketEvent = new();
     public string BookingUrl { get; set; } = "/BookingPage";
 
-    // För sökning till bookingpage
+
     public string searchWord = "";
 
 
@@ -107,7 +107,10 @@
     {
         navManInCode.NavigateTo($"/Bookingpage/{searchWord}");
     }
-
+    /// <summary>
+    /// Grabbing events and then checks them, foreaching every event and then showing them. 
+    /// </summary>
+    /// <returns></returns>
     protected override async Task OnInitializedAsync()
     {
         allEvents = await GetAllEvents();
@@ -129,12 +132,14 @@
         }
         else
         {
-            // no tickets = no shown tickets
         }
-        
+
     }
 
-
+    /// <summary>
+    /// Grabbing all events
+    /// </summary>
+    /// <returns></returns>
     public async Task<List<EventViewModel>> GetAllEvents()
     {
         var response = await codeClient.GetAsync("api/Events");
@@ -147,7 +152,10 @@
         }
         return null;
     }
-
+    //// <summary>
+    /// Getting a booked ticket 
+    /// </summary>
+    /// <returns></returns>
     public async Task<List<TicketViewModel>> GetBookedTickets()
     {
         try
@@ -182,27 +190,4 @@
         }
         return null;
     }
-
-    //private void FilterEvent(ChangeEventArgs e)
-    //{
-    //    events = allEvents!.Where(p =>
-    //        p.Name!.ToLower().Contains(e.Value!.ToString()!.ToLower()) ||
-    //        p.Location.ToLower().Contains(e.Value!.ToString()!.ToLower()) ||
-    //        p.EventType.ToLower().Contains(e.Value!.ToString()!.ToLower())
-    //        ).ToList();
-    //}
-
-    //public async Task<List<EventViewModel?>> GetOneEvent()
-    //{
-    //    var response = await codeClient.GetAsync($"api/Events/{Id}");
-    //    var statusCode = response.StatusCode;
-    //    if (statusCode == System.Net.HttpStatusCode.OK)
-    //    {
-    //        var responseBody = await response.Content.ReadAsStringAsync();
-    //        List<EventViewModel?> eventVM = JsonConvert.DeserializeObject<List<EventViewModel?>>(responseBody);
-    //        return eventVM;
-    //    }
-    //    return null;
-
-    //}
 }
