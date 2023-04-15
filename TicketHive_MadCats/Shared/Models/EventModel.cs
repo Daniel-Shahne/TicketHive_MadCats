@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace TicketHive_MadCats.Shared.Models
 {
+    /// <summary>
+    /// For use in database and backend only. Model describing
+    /// each event. 
+    /// </summary>
     public class EventModel
     {
         // Self properties

@@ -22,6 +22,11 @@ namespace TicketHive_MadCats.Server.Controllers
             this.userManager = userManager;
         }
 
+        /// <summary>
+        /// Gets the country of an user
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         [HttpGet("{username}")]
         public async Task<ActionResult<string>> GetCountry(string username)
         {
@@ -34,6 +39,11 @@ namespace TicketHive_MadCats.Server.Controllers
         }
 
         // PUT api/<UsersV2Controller>/5
+        /// <summary>
+        /// Updates an users password and/or country
+        /// </summary>
+        /// <param name="updateUserModel">An UpdateUserModel serialized using Newtonsoft</param>
+        /// <returns></returns>
         [HttpPut]
         public async Task<ActionResult> Put([FromBody]string updateUserModel)
         {
