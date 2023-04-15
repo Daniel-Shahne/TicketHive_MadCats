@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Security.Claims;
 using TicketHive_MadCats.Server.Models;
 using TicketHive_MadCats.Server.Repos.RepoInterfaces;
@@ -32,6 +33,11 @@ namespace TicketHive_MadCats.Server.Controllers
 
 
         // api/Tickets/Ticket5
+        /// <summary>
+        /// Gets one TicketModel of corresponding id, if existing
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("Ticket{id}")]
         [Authorize]
         public async Task<ActionResult<TicketViewModel?>> GetOne(int id)
@@ -51,6 +57,11 @@ namespace TicketHive_MadCats.Server.Controllers
 
 
         // GET api/Tickets/UsernameAdmin
+        /// <summary>
+        /// Gets all TicketModel's with their username property matching userName
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
         [HttpGet("Username{userName}")]
         [Authorize]
         public async Task<ActionResult<List<TicketViewModel>>> GetUserTickets(string userName)
@@ -68,20 +79,34 @@ namespace TicketHive_MadCats.Server.Controllers
         }
 
 
-
         // POST api/<TicketsController>
-        [HttpPost("{userName}books{eventId}times{quantity}")]
+        /// <summary>
+        /// Attempts booking (i.e adding to database) tickets, for an user, of a certain event.
+        /// </summary>
+        /// <param name="bookEventTicketsModel">A BookEventTicketsModel serialized using Newtonsoft</param>
+        /// <returns></returns>
+        [HttpPost("book")]
         [Authorize]
-        public async Task<ActionResult> Post(string userName, int eventId, int quantity)
+        public async Task<ActionResult> Post([FromBody] string bookEventTicketsModel)
         {
+            // deserializes
+            BookEventTicketsModel? model = JsonConvert.DeserializeObject<BookEventTicketsModel>(bookEventTicketsModel);
+            if(model == null) return BadRequest("No valid JSON sent");
+
+            string userName = model.Username;
+            string eventName = model.Eventname;
+            int quantity = model.Quantity;
+
             // Checks if there is a valid user for that username
             var user = await userManager.FindByNameAsync(userName);
             if (user == null) { return Unauthorized($"No user with name {userName} found"); }
-            
+
+            // Replaces _ in eventName with a space
+            string fixedEventName = eventName.Replace("_", " ");
 
             // Returns NotFound if no event was found of that id
-            EventModel? eventToBook = await eventRepo.GetOneEventById(eventId);
-            if (eventToBook == null) { return NotFound($"No event with Id {eventId} exists"); }
+            EventModel? eventToBook = await eventRepo.GetOneEventByName(fixedEventName);
+            if (eventToBook == null) { return NotFound($"No event with Id {fixedEventName} exists"); }
 
             // Checks if the event if avaliable to book {quantity} amount of times
             int ticketsLeft = eventToBook.MaxTickets - eventToBook.Tickets.Count;
@@ -102,7 +127,7 @@ namespace TicketHive_MadCats.Server.Controllers
                 TicketModel newTicket = new()
                 {
                     Username = userName,
-                    EventModelId = eventId,
+                    EventModelId = eventToBook.Id,
                 };
                 listOfTicketsToBook.Add(newTicket);
             }
@@ -115,13 +140,18 @@ namespace TicketHive_MadCats.Server.Controllers
             }
             else
             {
-                return Conflict("Could not book tickets");
+                return Conflict($"Database conflict for when booking {fixedEventName}");
             }
         }
 
 
-
+        
         // DELETE api/<TicketsController>/5
+        /// <summary>
+        /// Deletes (unbooks) a ticket of given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<ActionResult> Delete(int id)

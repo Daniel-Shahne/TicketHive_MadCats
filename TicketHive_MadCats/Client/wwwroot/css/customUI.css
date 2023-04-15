@@ -1,0 +1,77 @@
+﻿body-admin {
+    background-color: #305076;
+    color: #fbe89c;
+}
+
+.form-control-admin {
+    background-color: #fbe89c;
+    color: #305076;
+}
+
+.btn-primary-admin {
+    background-color: #fbe89c;
+    color: #305076;
+}
+
+.btn-danger-admin {
+    background-color: #305076;
+    color: #fbe89c;
+}
+
+.table-admin {
+    background-color: #305076;
+    color: #fbe89c;
+}
+
+th-admin {
+    background-color: #305076;
+    color: #fbe89c;
+    
+}
+
+.admin-header {
+    background-color: #305076;
+    color: #fbe89c;
+    border: solid 10px;
+    display: inline-block;
+    
+}
+
+.status-message {
+    background-color: #305076;
+    color: #fbe89c;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.delete-status-message {
+    background-color: #fbe89c;
+    color: #305076;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.logo-admin {
+    width: 200px;
+    height: 200px;
+}
+
+.form-container {
+    background-color: #fbe89c;
+    color: #305076;
+    padding: 20px;
+}
+
+.header-container {
+    background-color: #305076;
+    color: #fbe89c;
+    margin: 10px;
+    padding: 2px;
+    display: inline-block;
+}
+
+
+
+/*
+    Nedan CSS kod är ämnad för Index sidan
+*/

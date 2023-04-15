@@ -27,6 +27,10 @@ namespace TicketHive_MadCats.Server.Controllers
         }
 
         // base/api/Events
+        /// <summary>
+        /// Gets all EventModels in database
+        /// </summary>
+        /// <returns>All EventModels projected into EventViewModels</returns>
         [HttpGet]
         public async Task<ActionResult<List<EventViewModel>>> GetAll()
         {
@@ -42,6 +46,11 @@ namespace TicketHive_MadCats.Server.Controllers
 
         // api/Events/3
         // GET api/<EventsController>/5
+        /// <summary>
+        /// Gets one EventModel from database with given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>The found EventModel as an EventViewModel</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<EventViewModel?>> Get(int id)
         {
@@ -55,6 +64,11 @@ namespace TicketHive_MadCats.Server.Controllers
         }
 
         // POST api/Events
+        /// <summary>
+        /// Creates a new EventModel entry in database
+        /// </summary>
+        /// <param name="newtonsoftModel">An EventModel serialized with Newtonsoft. Should be in request body</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody]string newtonsoftModel)
         {
@@ -71,13 +85,12 @@ namespace TicketHive_MadCats.Server.Controllers
             }
         }
 
-        // PUT api/<EventsController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
         // DELETE api/<EventsController>/5
+        /// <summary>
+        /// Deletes an EventModel entry from database with corresponding id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

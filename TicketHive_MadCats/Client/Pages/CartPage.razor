@@ -1,0 +1,303 @@
+﻿@page "/CartPage"
+@attribute [Authorize]
+
+@using Blazored.LocalStorage;
+@using BusinessLogic;
+@using Microsoft.AspNetCore.Authorization;
+@using Newtonsoft.Json;
+@using TicketHive_MadCats.Client.Cookies
+@using TicketHive_MadCats.Shared.Models;
+@using TicketHive_MadCats.Shared.ViewModels;
+@inject IJSRuntime JsRuntime
+@inject ILocalStorageService injLocalService
+@inject NavigationManager navMan
+@inject AuthenticationStateProvider injAuthStateProvider
+
+<h3>CartPage</h3>
+
+@if(cart != null && cart.Count > 0)
+{
+	<div class="row text-center justify-content-center border border-2 border-dark m-2 p-2">
+		@*Loopar över varje eventviewmodel som finns i vår cart*@
+		@foreach (var cartEvent in cartEvents)
+		{
+			@*Loopar över det dictionary objekt som har samma namn som EVM som loopas över?*@
+			@foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
+			{
+				<div>
+					<span>Event @kvp.Key | @kvp.Value tickets in cart |Individual ticket price: @ticketPricesDict[kvp.Key] @convertCurrencyTo |)</span>
+					<br>
+					<div>
+						<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
+						<button @onclick="@(async () => await AddToCart(kvp.Key))">Add</button>
+						<button @onclick="@(async () => await RemoveAllFromCart(kvp.Key))">Remove all in cart</button>
+					</div>
+				</div>
+			}
+		}
+		<br>
+		<span>Total price for everything: @totalPriceFV @convertCurrencyTo</span>
+		<button style="width: 100px; height: 50px;" @onclick="() => PayStuff()">Pay</button> @*Går till confirm TODO*@
+	</div>
+
+	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
+	<button style="width: 100px; height: 50px;" @onclick="@(async () => await RemoveEveryCart())">Remove everything</button>
+}
+else if (cart != null && cart.Count == 0)
+{
+	<span>Your cart is empty</span>
+
+	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
+}
+else if (cart == null)
+{
+	<span>Loading cart...</span>
+}
+
+
+
+@code {
+	[Parameter]
+	public int Id { get; set; }
+	[Inject]
+	public IJSRuntime jS { get; set; }
+	[Inject]
+	HttpClient codeClient { get; set; }
+	[Inject]
+	AuthenticationStateProvider authStateProvider { get; set; }
+	[Inject]
+	NavigationManager navManInCode { get; set; }
+	[Inject]
+	ILocalStorageService injLocalStorage { get; set; }
+
+
+	public CookieInterpreter? cookieInt;
+	CookiesLocalStorage localStorage;
+	public Dictionary<string, int>? cart = null;
+
+
+	public EventViewModel? Event;
+	public string BookUrl { get; set; } = "/BookingPage";
+	public string ConfirmUrl { get; set; } = "/ConfirmPage";
+	private List<EventViewModel>? allEvents = new();
+	private List<EventViewModel>? cartEvents;
+
+	// Price conversion stuff
+	string country;
+	string username;
+	string convertCurrencyTo;
+	public Dictionary<string, double>? ticketPricesDict;
+	public double totalPriceFV;
+
+
+	protected override async Task OnParametersSetAsync()
+	{
+		localStorage = new(injLocalStorage);
+		var responseDict = await localStorage.ReadCartLSAsync();
+		if (responseDict != null && responseDict.Any())
+		{
+			cart = responseDict;
+		}
+		else
+		{
+			cart = new();
+		}
+
+		allEvents = await GetAllEvents();
+
+		// filter the list of all events to get only those events that are in the cart
+		if (cart != null && cart.Any())
+		{
+			cartEvents = allEvents.Where(e => cart.ContainsKey(e.Name)).ToList();
+		}
+
+		// Price conversion stuff
+		var user = await authStateProvider.GetAuthenticationStateAsync();
+		if (user != null)
+		{
+			username = user.User.Identity.Name;
+
+			var response = await codeClient.GetAsync($"api/usersv2/{username}");
+			var body = await response.Content.ReadAsStringAsync();
+			country = body;
+
+			if (country.Equals("United Kingdom")) convertCurrencyTo = "GBP";
+			else if (country.Equals("Sweden")) convertCurrencyTo = "SEK";
+			else convertCurrencyTo = "EUR";
+		}
+
+		if (cart != null && cart.Any())
+		{
+			ticketPricesDict = new();
+			foreach(var kvp in cart)
+			{
+				int price = cartEvents.First(evm => evm.Name == kvp.Key).TicketPrice;
+
+				if (convertCurrencyTo.Equals("SEK"))
+				{
+					ticketPricesDict[kvp.Key] = price;
+				}
+				else
+				{
+					ticketPricesDict[kvp.Key] = await ConvertApiCaller.ConvertSekToCurrencyAsyncIntOnly(convertCurrencyTo, price);
+				}
+			}
+		}
+
+		await TotalCartPrice();
+	}
+
+	public async Task PayStuff()
+	{
+		// List in which the responses will be saved
+		List<string> listOfResponses = new();
+
+		// Gets the username
+		var state = await authStateProvider.GetAuthenticationStateAsync();
+		var user = state.User;
+		var username = user.Identity.Name;
+
+		// Loops over cart items and purchases tickets for each
+		foreach(var kvp in cart)
+		{
+			// Replaces space with underscore to work in url, for the event name
+			string eventNameWithUnderscore = kvp.Key.Replace(" ", "_"); // "Rock Concert" = "Rock_Concert"
+
+			// Creates new object to send data with and serializes it
+			BookEventTicketsModel model = new()
+				{
+					Username = username,
+					Eventname = eventNameWithUnderscore,
+					Quantity = kvp.Value
+				};
+			string serializedModel = JsonConvert.SerializeObject(model);
+
+			// Sends a post request and checks the response.
+			var response = await codeClient.PostAsJsonAsync($"api/Tickets/book", serializedModel);
+			var status = response.StatusCode;
+
+			// Checks the status code of the request. If something went wrong with
+			// booking the request (status != ok) adds the server response error msg
+			// to listofresponses. Otherwise adds an "success" message to that same
+			// list
+			if (status != System.Net.HttpStatusCode.OK)
+			{
+				string body = await response.Content.ReadAsStringAsync();
+				listOfResponses.Add(body);
+			}
+			else
+			{
+				listOfResponses.Add($"Successfully booked {kvp.Value} tickets to {kvp.Key}!");
+			}
+		}
+
+		string serializedLOR = JsonConvert.SerializeObject(listOfResponses);
+
+		await localStorage.DeleteCookie();
+
+		navManInCode.NavigateTo($"/ConfirmationPage/{serializedLOR}");
+	}
+
+	public async Task RemoveFromCart(string eventName)
+	{
+		//int newQuantity = cart[eventName] - 1;
+		//cart = await cookieInt.UpdateCookieForSingleEvent(eventName, -1);
+
+		if (cart.ContainsKey(eventName))
+		{
+			cart[eventName] -= 1;
+
+			if (cart[eventName] <= 0) cart.Remove(eventName);
+		}
+
+		await localStorage.UpdateCartLSAsync(cart);
+
+		await TotalCartPrice();
+	}
+
+	public async Task AddToCart(string eventName)
+	{
+		//int newQuantity = cart[eventName] + 1;
+		//cart = await cookieInt.UpdateCookieForSingleEvent(eventName, 1);
+
+		if (cart.ContainsKey(eventName))
+		{
+			cart[eventName] += 1;
+		}
+
+		await localStorage.UpdateCartLSAsync(cart);
+
+		await TotalCartPrice();
+	}
+
+	public async Task RemoveAllFromCart(string eventName)
+	{
+		cart.Remove(eventName);
+		//await cookieInt.UpdateCookie(cart);
+
+		await localStorage.UpdateCartLSAsync(cart);
+
+		await TotalCartPrice();
+	}
+
+	public async Task RemoveEveryCart()
+	{
+		cart = new Dictionary<string, int>();
+		//await cookieInt.UpdateCookie(cart);
+
+		await localStorage.UpdateCartLSAsync(cart);
+	}
+
+	public async Task TotalCartPrice()
+	{
+		if (cart == null) totalPriceFV = 0;
+
+		double totalPrice = 0;
+
+		if(cartEvents != null)
+		{
+			foreach (var cartEvent in cartEvents)
+			{
+				foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
+				{
+					int quantity = kvp.Value;
+					int ticketPrice = cartEvent.TicketPrice;
+					int itemTotalPrice = CalculateTotalPrice(quantity, ticketPrice);
+					totalPrice += itemTotalPrice;
+				}
+			}
+		}
+
+		if (!convertCurrencyTo.Equals("SEK"))
+		{
+			totalPrice = await ConvertApiCaller.ConvertSekToCurrencyAsyncIntOnly(convertCurrencyTo, totalPrice);
+		}
+
+		totalPriceFV = totalPrice;
+	}
+
+	public int CalculateTotalPrice(int quantity, int ticketPrice)
+	{
+		return quantity * ticketPrice;
+	}
+
+	public async Task<List<EventViewModel>> GetAllEvents()
+	{
+		var response = await codeClient.GetAsync("api/Events");
+		var statusCode = response.StatusCode;
+		if (statusCode == System.Net.HttpStatusCode.OK)
+		{
+			var responseBody = await response.Content.ReadAsStringAsync();
+			List<EventViewModel?> eventVM = JsonConvert.DeserializeObject<List<EventViewModel?>>(responseBody);
+			return eventVM;
+		}
+		return null;
+	}
+
+	public int totalEvents()
+	{
+		int TotalEvent = Event.MaxTickets - Event.BookedTickets;
+
+		return TotalEvent;
+	}
+}

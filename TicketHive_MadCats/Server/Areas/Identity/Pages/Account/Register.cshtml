@@ -3,16 +3,119 @@
 @{
 }
 
-<h1>Register</h1>
-
-<form method="post">
-    <label for="input-username">Username:</label>
-    <input id="input-username" type="text" asp-for="Username" />
-    <label for="input-password">Password:</label>
-    <input id="input-password" type="password" asp-for="Password" />
-    <input type="submit" value="Register" />
-    <div>
-        <span class="text-danger" asp-validation-for="Username"></span>
-        <span class="text-danger" asp-validation-for="Password"></span>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card mt-5">
+                    <div class="card-body">
+                        <img src="/images/logos/black.png" alt="TicketHiveLogo" margin-top="10px" width="400" height="250">
+                        <h1 class="card-title text-center mb-4">Register</h1>
+                        <form method="post">
+                            <div class="form-group">
+                                <label for="input-username">Username:</label>
+                                <input id="input-username" type="text" asp-for="Username" class="form-control" />
+                                <span asp-validation-for="Username" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-password">Password:</label>
+                                <input id="input-password" type="password" asp-for="Password" class="form-control" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SelectedCountry" class="control-label">Country:</label>
+                                <select asp-for="SelectedCountry" asp-items="@(new SelectList(Model.ListOfCountries))" class="form-control"></select>
+                                <span asp-validation-for="SelectedCountry" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-block">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</form>
+
+    <style>
+        html, body {
+            background-color: #305076;
+            color: #305076;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 0;
+            border: none;
+            border-bottom: 2px solid #305076;
+            box-shadow: none;
+        }
+
+            .form-control:focus {
+                box-shadow: none;
+                border-color: #305076;
+            }
+
+        .btn-primary {
+            background-color: #305076;
+            border: none;
+            border-radius: 0;
+            font-weight: bold;
+        }
+
+            .btn-primary:hover {
+                background-color: #2C4E71;
+            }
+
+        label {
+            font-weight: bold;
+        }
+
+        .text-danger {
+            font-size: 0.8rem;
+        }
+    </style>
+</body>
+
+
+@*<body>
+    <h1>Register</h1>
+
+    <form method="post">
+        <label for="input-username">Username:</label>
+        <input id="input-username" type="text" asp-for="Username" />
+        <label for="input-password">Password:</label>
+        <input id="input-password" type="password" asp-for="Password" />
+        <input type="submit" value="Register" />
+        <div>
+            <span class="text-danger" asp-validation-for="Username"></span>
+            <span class="text-danger" asp-validation-for="Password"></span>
+        </div>
+        <br />
+        <div class="form-group">
+            <label asp-for="SelectedCountry" class="control-label"> Country:</label>
+            <select asp-for="SelectedCountry" asp-items="@(new SelectList(Model.ListOfCountries))" class="form-control"></select>
+            <span asp-validation-for="SelectedCountry" class="text-danger"></span>
+        </div>
+    </form>
+</body>
+
+    <style>
+        html, body {
+            background-color: #F0F0F0;
+            color: #305076;
+        }
+
+    .navbar {
+        background-color: #305076;
+        color: #F0F0F0;
+    </style>*@

@@ -1,0 +1,205 @@
+﻿@page "/EventPage/{Id:int}"
+@using Blazored.LocalStorage;
+@using BusinessLogic;
+@using Microsoft.AspNetCore.Authorization;
+@using Newtonsoft.Json;
+@using TicketHive_MadCats.Client.Cookies;
+@using TicketHive_MadCats.Shared.ViewModels;
+@inject HttpClient client
+@inject NavigationManager navMan
+@inject IJSRuntime JSRuntime
+@inject ILocalStorageService injLocalService
+@inject AuthenticationStateProvider injAuth
+@attribute [Authorize]
+
+<body>
+    @if (Event != null)
+
+    {
+
+        @if (Event.BookedTickets >= Event.MaxTickets)
+        {
+            <em class="color text-danger">  Event is fully booked!</em>
+        }
+        else
+        {
+            <h2>Name: @Event.Name</h2>
+            <br />
+            <h2>Event type: @Event.EventType</h2>
+            <br />
+            <h2>Event Price: @if(ticketForeignPrice != null)
+                {
+                    <span>@ticketForeignPrice</span> @convertCurrencyTo
+                }
+                else
+                {
+                    <span>@Event.TicketPrice</span> @convertCurrencyTo
+                }
+            </h2>
+            <br />
+            <h2>Location: @Event.Location</h2>
+            <br />
+            <h2>Date: @Event.Date</h2>
+            <br />
+            <h2>Tickets available: @totalEvents();</h2>
+            <br />
+            @foreach (var ImgPath in ImgPaths)
+            {
+                <img src=@ImgPath width="250" height="250" style="margin-right: 10px;">
+
+            }
+            <br />
+            <div>
+                <label for="numberInput">Quantity:</label>
+                <input type="number" id="numberInput" @bind-value="@myNumber" @bind-value:event="oninput"/>
+                @if (showWarning)
+                {
+                    <span style="color:red">Please enter a number</span>
+                }
+                @if ((myNumber <= Event.MaxTickets - Event.BookedTickets) && myNumber >0)
+                {
+                    <button @onclick="HandleSubmit">book @myNumber</button>
+
+                }
+                @if (formSubmitted)
+                {
+                    <span style="color:green">Ticket(s) are booked!</span>
+                }
+            </div>
+            <button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart page!</button>
+        }
+    }
+    else
+    {
+        <h3>Loading events... </h3>
+    }
+    <div>
+        <button @onclick="() => navMan.NavigateTo(IndexUrl)" style="margin: 10px;">Go to HomePage</button>
+    </div>
+
+</body>
+
+
+<style>
+    html, body {
+        background-color: #F0F0F0;
+        color: #305076;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Inject]
+    HttpClient codeClient { get; set; }
+    [Inject]
+    IJSRuntime jS { get; set; }
+    [Inject]
+    NavigationManager navMana { get; set; }
+    [Inject]
+    ILocalStorageService localService { get; set; }
+    [Inject]
+    AuthenticationStateProvider authStateProvider { get; set; }
+
+
+    // Cookies stuff
+    CookieInterpreter? cookieInterpreter;
+    CookiesLocalStorage? cookieLocalStorage;
+    Dictionary<string, int>? cart;
+
+    public EventViewModel? Event;
+    public List<string> ImgPaths;
+    public string IndexUrl { get; set; } = "/";
+    public string CartUrl { get; set; } = "/Cartpage";
+
+    private int myNumber;
+    private bool showWarning = false;
+    private bool formSubmitted;
+
+    public string convertCurrencyTo;
+    public string country;
+    public string username;
+    public double? ticketForeignPrice;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Event = await GetOneEvent();
+        DeserializeImgs();
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        cookieInterpreter = new(jS);
+        cookieLocalStorage = new(localService);
+
+        cart = await cookieLocalStorage.ReadCartLSAsync();
+        if (cart == null) cart = new();
+
+        var user = await authStateProvider.GetAuthenticationStateAsync();
+        if (user != null)
+        {
+            username = user.User.Identity.Name;
+
+            var response = await codeClient.GetAsync($"api/usersv2/{username}");
+            var body = await response.Content.ReadAsStringAsync();
+            country = body;
+
+            if (country.Equals("United Kingdom")) convertCurrencyTo = "GBP";
+            else if (country.Equals("Sweden")) convertCurrencyTo = "SEK";
+            else convertCurrencyTo = "EUR";
+
+            if (!convertCurrencyTo.Equals("SEK"))
+            {
+                ticketForeignPrice = await ConvertApiCaller.ConvertSekToCurrencyAsyncIntOnly(convertCurrencyTo, Event.TicketPrice);
+            }
+        }
+    }
+
+    public void DeserializeImgs()
+    {
+        if(Event != null)
+        {
+            ImgPaths = JsonConvert.DeserializeObject<List<string>>(Event.ImageSrcs);
+        }
+    }
+
+
+    public async Task<EventViewModel?> GetOneEvent()
+    {
+        var response = await codeClient.GetAsync($"api/Events/{Id}");
+        var statusCode = response.StatusCode;
+        if (statusCode == System.Net.HttpStatusCode.OK)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            EventViewModel? eventVM = JsonConvert.DeserializeObject<EventViewModel?>(responseBody);
+            return eventVM;
+        }
+        return null; 
+
+    }
+
+    private async Task HandleSubmit()
+    {
+        formSubmitted = true;
+        //await cookieInterpreter.UpdateCookieForSingleEvent(Event.Name, myNumber);
+
+        if (cart.ContainsKey(Event.Name))
+        {
+            cart[Event.Name] += myNumber;
+        }
+        else
+        {
+            cart.Add(Event.Name, myNumber);
+        }
+
+        await cookieLocalStorage.UpdateCartLSAsync(cart);
+    }
+
+    public int totalEvents()
+    {
+        int TotalEvent = Event.MaxTickets - Event.BookedTickets;
+
+        return TotalEvent;
+    }
+}
