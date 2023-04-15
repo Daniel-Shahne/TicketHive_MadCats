@@ -68,7 +68,7 @@ namespace TicketHive_MadCats.Server.Data
                     EventType = "Concert",
                     TicketPrice = 100,
                     Location = "Malmö, Sweden",
-                    Date = DateTime.Now,
+                    Date = DateTime.Now.AddMonths(7),
                     MaxTickets = 5,
                     ImageSrcs = TE1S
                 },
@@ -79,7 +79,7 @@ namespace TicketHive_MadCats.Server.Data
                     EventType = "Concert",
                     TicketPrice = 50,
                     Location = "Stockholm, Sweden",
-                    Date = DateTime.Now,
+                    Date = DateTime.Now.AddDays(7),
                     MaxTickets = 2,
                     ImageSrcs= TE2S
                 },
@@ -90,7 +90,7 @@ namespace TicketHive_MadCats.Server.Data
                     EventType = "Tournament",
                     TicketPrice = 5000,
                     Location = "Krakow, Poland",
-                    Date = DateTime.Now,
+                    Date = DateTime.Now.AddYears(3),
                     MaxTickets = 100,
                     ImageSrcs = TE3S
                 },
@@ -101,7 +101,7 @@ namespace TicketHive_MadCats.Server.Data
                     EventType = "Exhibition",
                     TicketPrice = 5,
                     Location = "Berlin, Germany",
-                    Date = DateTime.Now,
+                    Date = DateTime.Now.AddHours(5),
                     MaxTickets = 20,
                     ImageSrcs = TE4S
                 }

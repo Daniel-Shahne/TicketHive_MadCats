@@ -63,7 +63,7 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                         new
                         {
                             Id = 1,
-                            Date = new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(628),
+                            Date = new DateTime(2023, 11, 15, 19, 27, 59, 959, DateTimeKind.Local).AddTicks(7395),
                             EventType = "Concert",
                             ImageSrcs = "[\"/images/event images/image-1.png\",\"/images/event images/image-2.png\"]",
                             Location = "Malmö, Sweden",
@@ -74,7 +74,7 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                         new
                         {
                             Id = 2,
-                            Date = new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(680),
+                            Date = new DateTime(2023, 4, 22, 19, 27, 59, 959, DateTimeKind.Local).AddTicks(7458),
                             EventType = "Concert",
                             ImageSrcs = "[\"/images/event images/image-3.png\",\"/images/event images/image-4.png\"]",
                             Location = "Stockholm, Sweden",
@@ -85,7 +85,7 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                         new
                         {
                             Id = 3,
-                            Date = new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(682),
+                            Date = new DateTime(2026, 4, 15, 19, 27, 59, 959, DateTimeKind.Local).AddTicks(7463),
                             EventType = "Tournament",
                             ImageSrcs = "[\"/images/event images/image-5.png\",\"/images/event images/image-6.png\"]",
                             Location = "Krakow, Poland",
@@ -96,7 +96,7 @@ namespace TicketHive_MadCats.Server.MigrationsEventTicket
                         new
                         {
                             Id = 4,
-                            Date = new DateTime(2023, 4, 11, 11, 26, 47, 317, DateTimeKind.Local).AddTicks(684),
+                            Date = new DateTime(2023, 4, 16, 0, 27, 59, 959, DateTimeKind.Local).AddTicks(7467),
                             EventType = "Exhibition",
                             ImageSrcs = "[\"/images/event images/image-7.png\",\"/images/event images/image-8.png\"]",
                             Location = "Berlin, Germany",
