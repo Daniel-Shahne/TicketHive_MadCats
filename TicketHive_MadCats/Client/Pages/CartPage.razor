@@ -25,20 +25,37 @@
 			@foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
 			{
 				<div>
-					<span>Event @kvp.Key | @kvp.Value tickets in cart |Individual ticket price: @ticketPricesDict[kvp.Key] @convertCurrencyTo |)</span>
-					<br>
-					<div>
-						<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
-						<button @onclick="@(async () => await AddToCart(kvp.Key))">Add</button>
-						<button @onclick="@(async () => await RemoveAllFromCart(kvp.Key))">Remove all in cart</button>
-					</div>
-				</div>
+            <span>Event @kvp.Key | @kvp.Value tickets in cart |Individual ticket price: @ticketPricesDict[kvp.Key] @convertCurrencyTo </span>
+            <br>
+            <div>
+                <button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
+                @if (kvp.Value > cartEvent.MaxTickets-cartEvent.BookedTickets)
+                {
+                    <button disabled>Add</button>
+					
+                }
+                else
+                {
+                    <button @onclick="@(async () => await AddToCart(kvp.Key))">Add</button>
+                }
+                <button @onclick="@(async () => await RemoveAllFromCart(kvp.Key))">Remove all in cart</button>
+				<br>
+
+            </div>
+	</div>
 			}
 		}
 		<br>
 		<span>Total price for everything: @totalPriceFV @convertCurrencyTo</span>
-		<button style="width: 100px; height: 50px;" @onclick="() => PayStuff()">Pay</button> @*Går till confirm TODO*@
-	</div>
+		@if (cart.Any(kvp => kvp.Value > cartEvents.First(ce => ce.Name == kvp.Key).MaxTickets - cartEvents.First(ce => ce.Name == kvp.Key).BookedTickets))
+
+		{
+			<button style="width: 100px; height: 50px;" @onclick="() => PayStuff()" disabled>Pay</button>
+		}
+		else
+		{
+			<button style="width: 100px; height: 50px;" @onclick="() => PayStuff()">Pay</button>
+		}@*Går till confirm TODO*@</div>
 
 	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
 	<button style="width: 100px; height: 50px;" @onclick="@(async () => await RemoveEveryCart())">Remove everything</button>
@@ -294,10 +311,5 @@ else if (cart == null)
 		return null;
 	}
 
-	public int totalEvents()
-	{
-		int TotalEvent = Event.MaxTickets - Event.BookedTickets;
 
-		return TotalEvent;
-	}
 }
