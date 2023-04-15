@@ -15,7 +15,7 @@
 
 <h3>CartPage</h3>
 
-@if(cart != null && cart.Count > 0)
+@if (cart != null && cart.Count > 0)
 {
 	<div class="row text-center justify-content-center border border-2 border-dark m-2 p-2">
 		@*Loopar över varje eventviewmodel som finns i vår cart*@
@@ -25,20 +25,37 @@
 			@foreach (var kvp in cart.Where(x => x.Key == cartEvent.Name))
 			{
 				<div>
-					<span>Event @kvp.Key | @kvp.Value tickets in cart |Individual ticket price: @ticketPricesDict[kvp.Key] @convertCurrencyTo |)</span>
+					<span>Event @kvp.Key | @kvp.Value tickets in cart |Individual ticket price: @ticketPricesDict[kvp.Key] @convertCurrencyTo </span>
 					<br>
 					<div>
 						<button @onclick="@(async () => await RemoveFromCart(kvp.Key))">Remove</button>
-						<button @onclick="@(async () => await AddToCart(kvp.Key))">Add</button>
+						@if (kvp.Value > cartEvent.MaxTickets - cartEvent.BookedTickets)
+						{
+							<button disabled>Add</button>
+
+						}
+						else
+						{
+							<button @onclick="@(async () => await AddToCart(kvp.Key))">Add</button>
+						}
 						<button @onclick="@(async () => await RemoveAllFromCart(kvp.Key))">Remove all in cart</button>
+						<br>
+
 					</div>
 				</div>
 			}
 		}
 		<br>
 		<span>Total price for everything: @totalPriceFV @convertCurrencyTo</span>
-		<button style="width: 100px; height: 50px;" @onclick="() => PayStuff()">Pay</button> @*Går till confirm TODO*@
-	</div>
+		@if (cart.Any(kvp => kvp.Value > cartEvents.First(ce => ce.Name == kvp.Key).MaxTickets - cartEvents.First(ce => ce.Name == kvp.Key).BookedTickets))
+
+		{
+			<button style="width: 100px; height: 50px;" @onclick="() => PayStuff()" disabled>Pay</button>
+		}
+		else
+		{
+			<button style="width: 100px; height: 50px;" @onclick="() => PayStuff()">Pay</button>
+		}@*Går till confirm TODO*@</div>
 
 	<button @onclick="() => navMan.NavigateTo(BookUrl)" style="margin: 10px;">Go to Bookingpage!</button>
 	<button style="width: 100px; height: 50px;" @onclick="@(async () => await RemoveEveryCart())">Remove everything</button>
@@ -53,7 +70,15 @@ else if (cart == null)
 {
 	<span>Loading cart...</span>
 }
+<style>
+	html, body {
+		background-color: #305076;
+		color: #F0F0F0;
+	}
 
+	h1, h2, h3, a, p, label {
+		color: #fbe89c;
+	}</style>
 
 
 @code {
@@ -147,6 +172,13 @@ else if (cart == null)
 		await TotalCartPrice();
 	}
 
+	/// <summary>
+	/// Serializes and sends cart to API for actual booking, i.e
+	/// adding to database. The results (and response from server
+	/// per booking) is displayed on the next page this method
+	/// redirects to which is ConfirmationPage
+	/// </summary>
+	/// <returns></returns>
 	public async Task PayStuff()
 	{
 		// List in which the responses will be saved
@@ -198,6 +230,11 @@ else if (cart == null)
 		navManInCode.NavigateTo($"/ConfirmationPage/{serializedLOR}");
 	}
 
+	/// <summary>
+	/// Removes a single ticket of a given event, from cart
+	/// </summary>
+	/// <param name="eventName"></param>
+	/// <returns></returns>
 	public async Task RemoveFromCart(string eventName)
 	{
 		//int newQuantity = cart[eventName] - 1;
@@ -215,6 +252,11 @@ else if (cart == null)
 		await TotalCartPrice();
 	}
 
+	/// <summary>
+	/// Adds a single ticket of a given event, to cart
+	/// </summary>
+	/// <param name="eventName"></param>
+	/// <returns></returns>
 	public async Task AddToCart(string eventName)
 	{
 		//int newQuantity = cart[eventName] + 1;
@@ -230,6 +272,11 @@ else if (cart == null)
 		await TotalCartPrice();
 	}
 
+	/// <summary>
+	/// Removes all tickets of a given event from cart
+	/// </summary>
+	/// <param name="eventName"></param>
+	/// <returns></returns>
 	public async Task RemoveAllFromCart(string eventName)
 	{
 		cart.Remove(eventName);
@@ -240,6 +287,10 @@ else if (cart == null)
 		await TotalCartPrice();
 	}
 
+	/// <summary>
+	/// Completely clears cart
+	/// </summary>
+	/// <returns></returns>
 	public async Task RemoveEveryCart()
 	{
 		cart = new Dictionary<string, int>();
@@ -248,6 +299,12 @@ else if (cart == null)
 		await localStorage.UpdateCartLSAsync(cart);
 	}
 
+	/// <summary>
+	/// Calculates the new totalprice and should be called anytime
+	/// cart contents is changed. Also converts to another currency
+	/// if field variable convertCurrencyTo is not SEK
+	/// </summary>
+	/// <returns></returns>
 	public async Task TotalCartPrice()
 	{
 		if (cart == null) totalPriceFV = 0;
@@ -276,11 +333,17 @@ else if (cart == null)
 		totalPriceFV = totalPrice;
 	}
 
+
 	public int CalculateTotalPrice(int quantity, int ticketPrice)
 	{
 		return quantity * ticketPrice;
 	}
 
+	/// <summary>
+	/// Gets all EventViewModel's from events api and returns them as a list
+	/// if successfull
+	/// </summary>
+	/// <returns></returns>
 	public async Task<List<EventViewModel>> GetAllEvents()
 	{
 		var response = await codeClient.GetAsync("api/Events");
@@ -294,6 +357,10 @@ else if (cart == null)
 		return null;
 	}
 
+	/// <summary>
+	/// Calculates how many tickets are avaliable for a given event
+	/// </summary>
+	/// <returns></returns>
 	public int totalEvents()
 	{
 		int TotalEvent = Event.MaxTickets - Event.BookedTickets;

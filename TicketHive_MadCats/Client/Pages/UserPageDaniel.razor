@@ -59,8 +59,17 @@ else
     <h3>Checking user credentials...</h3>
 }
 
+<style>
+    html, body {
+        background-color: #305076;
+        color: #F0F0F0;
+    }
+
+    h1, h2, h3, a, p, label {
+        color: #fbe89c;
+    }</style>
 @code {
-    // Injected properties
+
     [Inject]
     AuthenticationStateProvider authStateProvider { get; set; } = null!;
     [Inject]
@@ -68,24 +77,24 @@ else
     [Inject]
     NavigationManager navMan { get; set; } = null!;
 
-    // Model to be sent on valid form
+
     UpdateUserModel updateModel = new();
 
-    // Variables for static use
+
     public List<string> countries = CountriesAndCodes.getListOfCountries;
 
-    // Variables for dynamic use
+
     string? serverErrorMessage;
     bool displaySuccessMessage = false;
 
-    // Variables bound to input values
+
     string oldPassword = "";
     string newPassword = "";
     string newCountry = "";
 
 
 
-    // Sets userName to logged in users username
+
     protected override async Task OnInitializedAsync()
     {
         var state = await authStateProvider.GetAuthenticationStateAsync();
@@ -96,30 +105,30 @@ else
             navMan.NavigateTo("/Index");
         }
 
-        // No idea why warning isnt suppressed
+
         updateModel.Username = user.Identity.Name;
     }
 
 
 
 
-    // List of errors to diplay, populated by HandleSubmit
+
     List<string> errorsList = new();
 
-    // Regex for use in password creation
+
     Regex capitalRegex = new Regex("[A-Z]");
     Regex specialCharRegex = new Regex("[¤%&$!#]");
 
-
+    /// <summary>
+    /// A method that updates password and/or country if criteria is met. 
+    /// </summary>
+    /// <returns></returns>
 
     public async Task HandleSubmit()
     {
-        // Clears any previous errors
+
         errorsList.Clear();
 
-        // Checks if oldpassword and newpassword are not empty
-        // Skip password setting otherwise
-        // Also fills or clears errorslist
         if(!oldPassword.Equals("") || !newPassword.Equals(""))
         {
             if (oldPassword.Length < 13) errorsList.Add("Current password is at least 13 characters");
@@ -138,7 +147,7 @@ else
             updateModel.CurrentPassword = null;
         }
 
-        // Sets country if one is chosen
+
         if(!newCountry.Equals(""))
         {
             updateModel.Country = newCountry;
@@ -148,7 +157,7 @@ else
             updateModel.Country = null;
         }
 
-        // If all fields are null then display error
+
         if(updateModel.Country == null && updateModel.CurrentPassword == null && updateModel.Password == null)
         {
             errorsList.Add("No changes are to be made");
