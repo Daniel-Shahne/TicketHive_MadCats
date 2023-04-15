@@ -1,5 +1,6 @@
 ﻿@page "/Homepage"
 @using Microsoft.AspNetCore.Authorization;
+@using System.Linq
 @using Newtonsoft.Json;
 @using System.Security.Claims;
 @using TicketHive_MadCats.Shared.Models;
@@ -78,9 +79,11 @@
         <h3>Booked tickets:</h3>
         @if (ShowTicketEvent != null)
         {
-            foreach (var events in ShowTicketEvent)
+            var ticketGroups = ShowTicketEvent.GroupBy(e => e.Name);
+            foreach (var group in ticketGroups)
             {
-                <p>@events.Name, @events.EventType, @events.Location, @events.Date</p>
+                // Display the ticket name and the number of tickets in the group
+                <p>@group.Key | @group.Count() Ticket(s)</p>
             }
         }
         else
