@@ -43,14 +43,16 @@
                 }
                 else
                 {
-                    <span>Tickets left: @totalEvents();</span>
+                    <span>Tickets left: @totalEvents()</span>
                 }
             </h2>
             <br />
             @foreach (var ImgPath in ImgPaths)
             {
-                <img src=@ImgPath width="250" height="250" style="margin-right: 10px;">
-
+                if(ImgPath != "none")
+                {
+                    <img src=@ImgPath width="250" height="250" style="margin-right: 10px;">
+                }
             }
             <br />
             <div>
@@ -62,12 +64,12 @@
                 }
                 @if ((myNumber <= Event.MaxTickets - Event.BookedTickets) && myNumber >0)
                 {
-                    <button @onclick="HandleSubmit">book @myNumber</button>
+                    <button @onclick="HandleSubmit">Add @myNumber to cart</button>
 
                 }
                 @if (formSubmitted)
                 {
-                    <span style="color:green">Ticket(s) are booked!</span>
+                    <span style="color:green">Ticket(s) are added to cart!</span>
                 }
             </div>
             <button @onclick="() => navMan.NavigateTo(CartUrl)" style="margin: 10px;">Go to cart page!</button>
